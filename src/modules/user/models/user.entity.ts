@@ -14,7 +14,7 @@ export class User {
 
   @Column({ length: 100, nullable: true, comment: '用户名' })
   @IsNotEmpty()
-  name: string;
+  username: string;
 
   @Column({ comment: '描述信息' })
   desc: string;
