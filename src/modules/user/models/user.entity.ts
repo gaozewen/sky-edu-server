@@ -12,9 +12,9 @@ export class User {
   @Column({ nullable: true, comment: '密码' })
   password: string;
 
-  @Column({ length: 100, nullable: false, comment: '昵称' })
+  @Column({ length: 100, nullable: true, comment: '用户名' })
   @IsNotEmpty()
-  nickname: string;
+  name: string;
 
   @Column({ comment: '描述信息' })
   desc: string;
