@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ConfigModule } from '@nestjs/config';
+import { OSSModule } from './modules/oss/oss.module';
 
 @Module({
   imports: [
@@ -22,9 +24,14 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      // 放到内存中自动生成
       autoSchemaFile: true,
+      // 也可以放到本地
+      // autoSchemaFile: './schema.gql',
     }),
+    ConfigModule.forRoot(),
     UserModule,
+    OSSModule,
   ],
   controllers: [AppController],
   providers: [AppService],
