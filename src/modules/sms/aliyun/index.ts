@@ -32,7 +32,11 @@ export const sendAliyunSMS = async (params: SMSInput): Promise<boolean> => {
   const runtime = new $Util.RuntimeOptions({});
   try {
     const res = await client.sendSmsWithOptions(sendSmsRequest, runtime);
-    return res.body.code === 'OK';
+    if (res.body.code !== 'OK') {
+      console.error('【阿里云短信发送失败】:', res.body.message);
+      return false;
+    }
+    return true;
   } catch (error) {
     console.error('【阿里云短信发送失败】:', error);
     // 请打印 error

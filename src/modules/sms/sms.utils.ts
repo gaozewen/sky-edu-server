@@ -31,7 +31,7 @@ const SIGN_NAME = {
 
 // 阿里云的短信模板 ID
 const TEMP_ALIYUN = {
-  [TempType.AUTH]: 'SMS_291560244',
+  [TempType.AUTH]: 'SMS_464085279',
   // TODO:
   [TempType.FORGET_PWD]: 'xxx',
 };
