@@ -7,7 +7,7 @@ export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
   @Mutation(() => Result, { description: '发送授权短信验证码' })
-  async sendAuthSMS(@Args('phoneNumber') phoneNumber: string): Promise<Result> {
-    return await this.authService.sendAuthSMS(phoneNumber);
+  async sendAuthSMS(@Args('tel') tel: string): Promise<Result> {
+    return await this.authService.sendAuthSMS(tel);
   }
 }
