@@ -26,7 +26,7 @@ export type SMSInput = {
 
 const SIGN_NAME = {
   SKY_EDU: '天空教育',
-  GZW_HOME_PAGE: '高泽文的个人主页',
+  GZW_HOME_PAGE: '高泽文的个人主页网站',
 };
 
 // 阿里云的短信模板 ID
@@ -36,17 +36,10 @@ const TEMP_ALIYUN = {
   [TempType.FORGET_PWD]: 'xxx',
 };
 
-// TODO:
 // 腾讯云的短信模板 ID
 const TEMP_TENCENT = {
-  [TempType.AUTH]: 'xxx',
+  [TempType.AUTH]: '1998939',
   [TempType.FORGET_PWD]: 'xxxxx',
-};
-
-const isTempParamsObj = (
-  params: any[] | TempParamsObj,
-): params is TempParamsObj => {
-  return typeof params === 'object' && !Array.isArray(params);
 };
 
 /**
@@ -54,7 +47,7 @@ const isTempParamsObj = (
  */
 export const getSMSTemplate = (params: SMSInput) => {
   const { platform, tempType, templateParams } = params;
-  if (platform === Platform.Aliyun && isTempParamsObj(templateParams)) {
+  if (platform === Platform.Aliyun) {
     return {
       signName: SIGN_NAME.SKY_EDU,
       templateCode: TEMP_ALIYUN[tempType],
@@ -62,7 +55,7 @@ export const getSMSTemplate = (params: SMSInput) => {
     };
   }
 
-  if (platform === Platform.Tencent && Array.isArray(templateParams)) {
+  if (platform === Platform.Tencent) {
     return {
       /* 短信签名内容: 使用 UTF-8 编码，必须填写已审核通过的签名 */
       // 签名信息可前往 [国内短信](https://console.cloud.tencent.com/smsv2/csms-sign) 或 [国际/港澳台短信](https://console.cloud.tencent.com/smsv2/isms-sign) 的签名管理查看

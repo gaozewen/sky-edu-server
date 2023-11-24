@@ -8,6 +8,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConfigModule } from '@nestjs/config';
 import { OSSModule } from './modules/oss/oss.module';
 import { SMSModule } from './modules/sms/sms.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { SMSModule } from './modules/sms/sms.module';
     UserModule,
     OSSModule,
     SMSModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

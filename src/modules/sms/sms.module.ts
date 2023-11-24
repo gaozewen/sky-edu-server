@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { SMSService } from './sms.service';
-import { SMSController } from './sms.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { SMS } from './models/sms.entity';
 
 @Module({
-  imports: [],
-  controllers: [SMSController],
+  imports: [TypeOrmModule.forFeature([SMS])],
+  controllers: [],
   providers: [SMSService],
   exports: [SMSService],
 })

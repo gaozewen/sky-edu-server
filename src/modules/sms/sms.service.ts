@@ -2,11 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { Platform, SMSInput, TempType } from './sms.utils';
 import { sendAliyunSMS } from './aliyun';
 import { sendTencentSMS } from './tencent';
+import { InjectRepository } from '@nestjs/typeorm';
+import { SMS } from './models/sms.entity';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class SMSService {
+  constructor(
+    @InjectRepository(SMS)
+    private readonly smsRepository: Repository<SMS>,
+  ) {}
+
   /**
-   *  发送短信
+   *  发送短信（此方法不暴露，仅供 SMSService 类内部使用）
+   *  要想增加发送其他类型的模板消息，请新增对应的模板接口
    */
   private async sendSMS(params: SMSInput): Promise<boolean> {
     try {
@@ -23,7 +32,7 @@ export class SMSService {
 
       // return isSuccess;
 
-      // TODO:
+      // TODO: 开发时默认都发送成功
       return true;
     } catch (error) {
       console.error('【所有通道短信发送失败】', error);
@@ -31,17 +40,56 @@ export class SMSService {
     }
   }
 
+  // 将验证码插入数据库
+  private async create(phoneNumber: string, code: string): Promise<boolean> {
+    try {
+      const res = await this.smsRepository.insert({
+        tel: phoneNumber,
+        code,
+      });
+      const isSuccess = res && res.raw && res.raw.affectedRows > 0;
+      if (!isSuccess) console.error('【数据库：验证码插入失败】');
+      return isSuccess;
+    } catch (error) {
+      console.error('【数据库：验证码插入失败】', error);
+      return false;
+    }
+  }
+
   /**
    *  发送授权短信
    */
-  async sendAuthSMS(phoneNumber: string, code: number): Promise<boolean> {
-    return await this.sendSMS({
+  async sendAuthSMS(phoneNumber: string, code: string): Promise<boolean> {
+    const isSuccess = await this.sendSMS({
       phoneNumber,
       tempType: TempType.AUTH,
       templateParams: {
         [Platform.Aliyun]: { code },
-        [Platform.Tencent]: [String(code)],
+        [Platform.Tencent]: [code],
       },
     });
+
+    if (isSuccess) {
+      return await this.create(phoneNumber, code);
+    }
+
+    return false;
+  }
+
+  /**
+   * 查询手机号验证码记录
+   */
+  async findSMSByTel(tel: string): Promise<SMS> {
+    const res = await this.smsRepository.findOne({ where: { tel } });
+    return res;
+  }
+
+  // 删除 SMS 记录
+  async delete(tel: string): Promise<boolean> {
+    const findOptionsWhere: FindOptionsWhere<SMS> = {
+      tel,
+    };
+    const res = await this.smsRepository.delete(findOptionsWhere);
+    return res && res.affected > 0;
   }
 }

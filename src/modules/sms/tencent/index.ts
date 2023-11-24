@@ -1,4 +1,5 @@
-import tencentcloud from 'tencentcloud-sdk-nodejs';
+// 必须这么导入否则无效
+import * as tencentcloud from 'tencentcloud-sdk-nodejs';
 import { Platform, SMSInput, getSMSTemplate } from '../sms.utils';
 
 const createTencentSMSClient = () => {
@@ -83,14 +84,26 @@ export const sendTencentSMS = async (params: SMSInput): Promise<boolean> => {
 
   try {
     // 通过client对象调用想要访问的接口，需要传入请求对象以及响应回调函数
-    client.SendSms(config, function (err) {
-      // 请求异常返回，打印异常信息
-      if (err) {
-        console.error('【腾讯云短信发送失败1】:', err);
-        return false;
-      }
+    const res = await client.SendSms(config);
+    // const res = {
+    //   SendStatusSet: [
+    //     {
+    //       SerialNo: '3369:355200258217008135154401386',
+    //       PhoneNumber: '+86xxxx',
+    //       Fee: 1,
+    //       SessionContext: '',
+    //       Code: 'Ok',
+    //       Message: 'send success',
+    //       IsoCode: 'CN',
+    //     },
+    //   ],
+    //   RequestId: 'ea8ee944-3105-4932-9d93-17f0c6990730',
+    // }
+    if (res?.SendStatusSet?.[0]?.Code === 'Ok') {
       return true;
-    });
+    }
+    console.log('【腾讯云短信发送失败1】', res);
+    return false;
   } catch (error) {
     console.error('【腾讯云短信发送失败2】:', error);
     return false;
