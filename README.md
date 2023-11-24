@@ -1,8 +1,8 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://p.ipic.vip/z8olya.png" width="200" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="
+https://cdn.gaozewen.com/images/logo_sky_edu.png" width="200" alt="Nest Logo" /></a>
 </p>
 
-<h1 align="center">天空教育 Server 端</h1>
 <p align="center">
       基于 Nest Typescript Graphql
 </p>
