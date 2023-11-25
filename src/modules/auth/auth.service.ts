@@ -69,9 +69,18 @@ export class AuthService {
 
   // JWT 签名
   private genJwtToken(user: User) {
-    const token = this.jwtService.sign({
-      id: user.id,
-    });
+    const token = this.jwtService.sign(
+      {
+        id: user.id,
+      },
+      {
+        secret: process.env.JWT_SECRET,
+        // https://github.com/vercel/ms
+        expiresIn: '7 days', // 生产环境
+        // TODO:
+        // expiresIn: '10s', // 测试环境
+      },
+    );
     return token;
   }
 
