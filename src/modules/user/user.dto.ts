@@ -23,4 +23,7 @@ export class UserDTO {
 
   @Field({ description: '账户信息' })
   readonly account?: string;
+
+  @Field({ description: '手机号' })
+  readonly tel: string;
 }

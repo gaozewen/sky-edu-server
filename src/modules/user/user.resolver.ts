@@ -1,9 +1,12 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
+import { JwtGqlAuthGuard } from '../auth/auth.guard';
 import { UserDTO, UserInput } from './user.dto';
 import { UserService } from './user.service';
 
 @Resolver('User')
+@UseGuards(JwtGqlAuthGuard)
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
@@ -14,6 +17,12 @@ export class UserResolver {
 
   @Query(() => UserDTO, { description: '使用 ID 查询用户' })
   async findById(@Args('id') id: string): Promise<UserDTO> {
+    return await this.userService.findById(id);
+  }
+
+  @Query(() => UserDTO, { description: '使用 JWT 中的 userId 查询用户' })
+  async getUserByJWT(@Context() cxt: any): Promise<UserDTO> {
+    const id = cxt.req.user.id;
     return await this.userService.findById(id);
   }
 
