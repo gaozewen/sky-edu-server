@@ -22,6 +22,8 @@ export class Result {
   code: number;
   @Field(() => String, { nullable: true })
   message?: string;
+  @Field(() => String, { nullable: true })
+  data?: string;
 }
 
 export interface IResult<T> {

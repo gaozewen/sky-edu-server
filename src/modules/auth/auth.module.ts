@@ -1,17 +1,29 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
 
-import { SMS } from '../sms/models/sms.entity';
-import { SMSService } from '../sms/sms.service';
-import { User } from '../user/models/user.entity';
-import { UserService } from '../user/user.service';
+import { JWT_SECRET } from '@/common/constants/jwt';
+
+import { SMSModule } from '../sms/sms.module';
+import { UserModule } from '../user/user.module';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   // 由于 service 中使用到了 SMS 实体，所以需要导入，否则报错
-  imports: [TypeOrmModule.forFeature([SMS, User])],
+  imports: [
+    SMSModule,
+    UserModule,
+    JwtModule.register({
+      secret: JWT_SECRET,
+      signOptions: {
+        // TODO
+        // jwt 过期时间
+        expiresIn: '60s',
+      },
+    }),
+  ],
   controllers: [],
-  providers: [AuthService, AuthResolver, SMSService, UserService],
+  providers: [AuthService, AuthResolver, JwtStrategy],
 })
 export class AuthModule {}

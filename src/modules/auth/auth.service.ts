@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import {
   ACCOUNT_NOT_EXIST,
   AUTH_CODE_ERROR,
@@ -23,6 +24,7 @@ export class AuthService {
   constructor(
     private readonly smsService: SMSService,
     private readonly userService: UserService,
+    private readonly jwtService: JwtService,
   ) {}
 
   // 发送授权短信验证码
@@ -63,6 +65,14 @@ export class AuthService {
       code: GET_AUTH_CODE_FAILED,
       message: '获取验证码失败',
     };
+  }
+
+  // JWT 签名
+  private genJwtToken(user: User) {
+    const token = this.jwtService.sign({
+      id: user.id,
+    });
+    return token;
   }
 
   // PC 验证码登录/注册
@@ -108,6 +118,7 @@ export class AuthService {
         return {
           code: SUCCESS,
           message: '登录成功',
+          data: this.genJwtToken(user),
         };
       }
       // 3.3 创建失败
@@ -120,6 +131,7 @@ export class AuthService {
     return {
       code: SUCCESS,
       message: '登录成功',
+      data: this.genJwtToken(user),
     };
   }
 
@@ -158,6 +170,7 @@ export class AuthService {
     return {
       code: SUCCESS,
       message: '登录成功',
+      data: this.genJwtToken(user),
     };
   }
 
