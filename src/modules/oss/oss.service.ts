@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { auth, rs } from 'qiniu';
+
 import { OSSDTO } from './oss.dto';
 
 @Injectable()

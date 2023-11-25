@@ -1,7 +1,8 @@
 import Dysmsapi20170525, * as $Dysmsapi20170525 from '@alicloud/dysmsapi20170525';
 import * as $OpenApi from '@alicloud/openapi-client';
 import Util, * as $Util from '@alicloud/tea-util';
-import { Platform, SMSInput, getSMSTemplate } from '../sms.utils';
+
+import { getSMSTemplate, Platform, SMSInput } from '../sms.utils';
 
 const createAliyunSMSClient = (): Dysmsapi20170525 => {
   const config = new $OpenApi.Config({

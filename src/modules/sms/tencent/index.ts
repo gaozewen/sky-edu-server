@@ -1,6 +1,7 @@
 // 必须这么导入否则无效
 import * as tencentcloud from 'tencentcloud-sdk-nodejs';
-import { Platform, SMSInput, getSMSTemplate } from '../sms.utils';
+
+import { getSMSTemplate, Platform, SMSInput } from '../sms.utils';
 
 const createTencentSMSClient = () => {
   // 导入对应产品模块的client models。
