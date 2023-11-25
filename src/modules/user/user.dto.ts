@@ -5,7 +5,7 @@ export class UserInput {
   @Field()
   account: string;
   @Field()
-  username: string;
+  nickname: string;
   @Field()
   desc: string;
 }
@@ -16,7 +16,7 @@ export class UserDTO {
   readonly id?: string;
 
   @Field()
-  readonly username?: string;
+  readonly nickname?: string;
 
   @Field()
   readonly desc?: string;

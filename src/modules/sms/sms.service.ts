@@ -5,6 +5,8 @@ import { sendTencentSMS } from './tencent';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SMS } from './models/sms.entity';
 import { FindOptionsWhere, Repository } from 'typeorm';
+// 必须这样引入否则会报错
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class SMSService {
@@ -92,4 +94,11 @@ export class SMSService {
     const res = await this.smsRepository.delete(findOptionsWhere);
     return res && res.affected > 0;
   }
+
+  isAuthSMSExpired = (sms: SMS): boolean => {
+    const diffTime = dayjs().diff(dayjs(sms.createdAt));
+    // 为了防止盗刷 验证码 24 小时之后过期，一个手机号一天只能发送成功一个验证码
+    // H * m * s * ms
+    return diffTime >= 24 * 60 * 60 * 1000;
+  };
 }

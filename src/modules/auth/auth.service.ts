@@ -1,30 +1,38 @@
 import { Injectable } from '@nestjs/common';
 
 import { SMSService } from '../sms/sms.service';
-// 必学这样引入否则会报错
-import * as dayjs from 'dayjs';
+
 import { Result } from 'src/common/dto/result.type';
 import {
-  AUTH_SMS_NOT_EXPIRED,
-  GET_AUTH_SMS_FAILED,
+  AUTH_CODE_EXPIRED,
+  DB_ERROR,
+  GET_AUTH_CODE_FAILED,
   SUCCESS,
+  AUTH_CODE_NOT_EXPIRED,
+  AUTH_CODE_ERROR,
+  ACCOUNT_NOT_EXIST,
+  PARAMS_REQUIRED_ERROR,
+  PASSWORD_ERROR,
 } from 'src/common/constants/code';
+import { AdminLoginInput } from './auth.dto';
+import { UserService } from '../user/user.service';
+import { User } from '../user/models/user.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly smsService: SMSService) {}
+  constructor(
+    private readonly smsService: SMSService,
+    private readonly userService: UserService,
+  ) {}
 
   // 发送授权短信验证码
   async sendAuthSMS(tel: string): Promise<Result> {
     const sms = await this.smsService.findSMSByTel(tel);
     if (sms) {
-      const diffTime = dayjs().diff(dayjs(sms.createdAt));
-      // 为了防止盗刷 验证码 24 小时之后过期，一个手机号一天只能发送成功一个验证码
-      // H * m * s * ms
-      if (diffTime < 24 * 60 * 60 * 1000) {
+      if (!this.smsService.isAuthSMSExpired(sms)) {
         // 未过期，直接返回提示
         return {
-          code: AUTH_SMS_NOT_EXPIRED,
+          code: AUTH_CODE_NOT_EXPIRED,
           message: '验证码尚未过期',
         };
       }
@@ -52,8 +60,123 @@ export class AuthService {
     }
 
     return {
-      code: GET_AUTH_SMS_FAILED,
+      code: GET_AUTH_CODE_FAILED,
       message: '获取验证码失败',
     };
+  }
+
+  // PC 验证码登录/注册
+  private async adminCodeLogin(
+    params: AdminLoginInput,
+    user: User,
+  ): Promise<Result> {
+    const { tel, code } = params;
+
+    // 0.手机号或验证码未输入
+    if (!tel || !code) {
+      return {
+        code: PARAMS_REQUIRED_ERROR,
+        message: !tel ? '请输入手机号' : '请输入验证码',
+      };
+    }
+
+    const sms = await this.smsService.findSMSByTel(tel);
+
+    // 1.验证码不存在 或 已过期
+    if (!sms || !sms.code || this.smsService.isAuthSMSExpired(sms)) {
+      return {
+        code: AUTH_CODE_EXPIRED,
+        message: '登录失败，验证码已过期，请重新获取',
+      };
+    }
+    // 2.验证码不正确
+    if (code !== sms.code) {
+      return {
+        code: AUTH_CODE_ERROR,
+        message: '登录失败，验证码不正确',
+      };
+    }
+    // 3.用户不存在
+    if (!user) {
+      // 3.1 创建用户
+      const isSuccess = await this.userService.create({
+        account: tel,
+        tel,
+      });
+      // 3.2 创建成功
+      if (isSuccess) {
+        return {
+          code: SUCCESS,
+          message: '登录成功',
+        };
+      }
+      // 3.3 创建失败
+      return {
+        code: DB_ERROR,
+        message: '登录失败',
+      };
+    }
+    // 4.用户存在
+    return {
+      code: SUCCESS,
+      message: '登录成功',
+    };
+  }
+
+  // PC 手机号密码登录
+  private async adminPwdLogin(
+    params: AdminLoginInput,
+    user: User,
+  ): Promise<Result> {
+    const { tel, password } = params;
+
+    // 0.手机号或密码未输入
+    if (!tel || !password) {
+      return {
+        code: PARAMS_REQUIRED_ERROR,
+        message: '请输入手机号和密码',
+      };
+    }
+
+    // 1.账户不存在
+    if (!user) {
+      return {
+        code: ACCOUNT_NOT_EXIST,
+        message: '账户不存在，请先注册',
+      };
+    }
+
+    // 2.账户存在
+    // 2.1 密码错误
+    if (password.trim() !== user.password) {
+      return {
+        code: PASSWORD_ERROR,
+        message: '登录失败，密码错误',
+      };
+    }
+    // 2.2 密码正确
+    return {
+      code: SUCCESS,
+      message: '登录成功',
+    };
+  }
+
+  // PC 端登录
+  async adminLogin(params: AdminLoginInput): Promise<Result> {
+    const { loginType, tel } = params;
+    if (!loginType) {
+      return {
+        code: PARAMS_REQUIRED_ERROR,
+        message: '登录失败，登录类型丢失',
+      };
+    }
+
+    const user = await this.userService.findByTel(tel);
+    // 验证码登录
+    if (loginType === 'mobile') {
+      return await this.adminCodeLogin(params, user);
+    }
+    // 账号密码登录
+    return await this.adminPwdLogin(params, user);
   }
 }

@@ -12,8 +12,8 @@ export class UserResolver {
   }
 
   @Query(() => UserDTO, { description: '使用 ID 查询用户' })
-  async find(@Args('id') id: string): Promise<UserDTO> {
-    return await this.userService.find(id);
+  async findById(@Args('id') id: string): Promise<UserDTO> {
+    return await this.userService.findById(id);
   }
 
   @Mutation(() => Boolean, { description: '更新用户' })

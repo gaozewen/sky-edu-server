@@ -28,9 +28,19 @@ export class UserService {
     return res && res.affected > 0;
   }
 
-  // 查询用户
-  async find(id: string): Promise<User> {
+  // 通过 ID 查找用户
+  async findById(id: string): Promise<User> {
     const res = await this.userRepository.findOne({ where: { id } });
+    return res;
+  }
+
+  // 通过手机号查找用户
+  async findByTel(tel: string): Promise<User> {
+    const res = await this.userRepository.findOne({
+      where: {
+        tel,
+      },
+    });
     return res;
   }
 }

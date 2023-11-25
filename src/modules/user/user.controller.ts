@@ -11,7 +11,7 @@ export class UserController {
     return await this.userService.create({
       account: 'admin',
       password: '123456',
-      username: '天空教育管理员',
+      nickname: '天空教育管理员',
       desc: '管理员',
       tel: '8800088',
     });
@@ -31,7 +31,7 @@ export class UserController {
       {
         account: 'admin',
         password: '123456',
-        username: '天空教育管理员111',
+        nickname: '天空教育管理员111',
         desc: '管理员',
         tel: '8800088',
       },
@@ -40,6 +40,8 @@ export class UserController {
 
   @Get('/find')
   async find(): Promise<User> {
-    return await this.userService.find('b1e2e948-f775-4aef-be86-c29a9f75835e');
+    return await this.userService.findById(
+      'b1e2e948-f775-4aef-be86-c29a9f75835e',
+    );
   }
 }

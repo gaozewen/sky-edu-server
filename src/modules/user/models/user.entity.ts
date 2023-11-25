@@ -9,16 +9,30 @@ export class User {
   @Column({ comment: '账户' })
   account: string;
 
-  @Column({ nullable: true, comment: '密码' })
+  @Column({ comment: '密码', default: '' })
   password: string;
 
-  @Column({ length: 100, nullable: true, comment: '用户名' })
+  @Column({ comment: '昵称', default: '', length: 100 })
   @IsNotEmpty()
-  username: string;
+  nickname: string;
 
-  @Column({ comment: '描述信息' })
+  @Column({ comment: '描述信息', default: '' })
   desc: string;
 
-  @Column({ nullable: true, comment: '手机号' })
+  @Column({ comment: '手机号' })
   tel: string;
+
+  @Column({
+    name: 'created_at',
+    default: () => 'CURRENT_TIMESTAMP',
+    comment: '创建时间',
+  })
+  createdAt: Date;
+
+  @Column({
+    name: 'updated_at',
+    default: () => 'CURRENT_TIMESTAMP',
+    comment: '修改时间',
+  })
+  updatedAt: Date;
 }
