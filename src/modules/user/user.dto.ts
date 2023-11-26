@@ -15,6 +15,12 @@ export class UserDTO {
   @Field()
   readonly id?: string;
 
+  @Field({ description: '用户头像' })
+  readonly avatar?: string;
+
+  @Field({ description: '手机号' })
+  readonly tel: string;
+
   @Field()
   readonly nickname?: string;
 
@@ -23,7 +29,14 @@ export class UserDTO {
 
   @Field({ description: '账户信息' })
   readonly account?: string;
+}
 
-  @Field({ description: '手机号' })
-  readonly tel: string;
+@InputType()
+export class ProfileInput {
+  @Field()
+  avatar: string;
+  @Field()
+  nickname?: string;
+  @Field()
+  desc?: string;
 }

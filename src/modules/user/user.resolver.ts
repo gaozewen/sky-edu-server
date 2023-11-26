@@ -1,8 +1,11 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
+import { DB_ERROR, SUCCESS } from '@/common/constants/code';
+import { Result } from '@/common/dto/result.type';
+
 import { JwtGqlAuthGuard } from '../auth/auth.guard';
-import { UserDTO, UserInput } from './user.dto';
+import { ProfileInput, UserDTO, UserInput } from './user.dto';
 import { UserService } from './user.service';
 
 @Resolver('User')
@@ -24,6 +27,25 @@ export class UserResolver {
   async getUserByJWT(@Context() cxt: any): Promise<UserDTO> {
     const id = cxt.req.user.id;
     return await this.userService.findById(id);
+  }
+
+  @Mutation(() => Result, { description: '更新用户画像' })
+  async updateUserProfile(
+    @Args('id') id: string,
+    @Args('params') params: ProfileInput,
+  ): Promise<Result> {
+    const isSuccess = await this.userService.update(id, params);
+    if (isSuccess) {
+      return {
+        code: SUCCESS,
+        message: '更新成功',
+      };
+    }
+
+    return {
+      code: DB_ERROR,
+      message: '更新失败',
+    };
   }
 
   @Mutation(() => Boolean, { description: '更新用户' })
