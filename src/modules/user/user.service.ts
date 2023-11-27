@@ -8,11 +8,11 @@ import {
   DB_ERROR,
   SUCCESS,
 } from '@/common/constants/code';
-import { Result } from '@/common/dto/result.type';
+import { ResultVO } from '@/common/vo/result.vo';
 
 import { SMSService } from '../sms/sms.service';
+import { ResetPwdDTO } from './dto/user.dto';
 import { User } from './models/user.entity';
-import { ResetPwdInput } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -62,7 +62,7 @@ export class UserService {
 
   // resetPwd
   // PC 端登录
-  async resetPwd(params: ResetPwdInput): Promise<Result> {
+  async resetPwd(params: ResetPwdDTO): Promise<ResultVO> {
     const { id, tel, code, password } = params;
     const sms = await this.smsService.findSMSByTel(tel);
     // 1.验证码不存在 或 已过期

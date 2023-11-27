@@ -1,10 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
 import { Column, Entity } from 'typeorm';
 
-import { CommonEntity } from '@/common/entities/common.entity';
+import { BaseEntity } from '@/common/entities/base.entity';
 
 @Entity('user')
-export class User extends CommonEntity {
+export class User extends BaseEntity {
   @Column({ comment: '账户' })
   account: string;
 

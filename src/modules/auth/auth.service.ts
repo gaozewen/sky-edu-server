@@ -12,12 +12,12 @@ import {
   SUCCESS,
 } from 'src/common/constants/code';
 
-import { Result } from '@/common/dto/result.type';
+import { ResultVO } from '@/common/vo/result.vo';
 
 import { SMSService } from '../sms/sms.service';
 import { User } from '../user/models/user.entity';
 import { UserService } from '../user/user.service';
-import { AdminLoginInput } from './auth.dto';
+import { AdminLoginDTO } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +28,7 @@ export class AuthService {
   ) {}
 
   // 发送授权短信验证码
-  async sendAuthSMS(tel: string): Promise<Result> {
+  async sendAuthSMS(tel: string): Promise<ResultVO> {
     const sms = await this.smsService.findSMSByTel(tel);
     if (sms) {
       if (!this.smsService.isAuthSMSExpired(sms)) {
@@ -86,9 +86,9 @@ export class AuthService {
 
   // PC 验证码登录/注册
   private async adminCodeLogin(
-    params: AdminLoginInput,
+    params: AdminLoginDTO,
     user: User,
-  ): Promise<Result> {
+  ): Promise<ResultVO> {
     const { tel, code } = params;
 
     // 0.手机号或验证码未输入
@@ -146,9 +146,9 @@ export class AuthService {
 
   // PC 手机号密码登录
   private async adminPwdLogin(
-    params: AdminLoginInput,
+    params: AdminLoginDTO,
     user: User,
-  ): Promise<Result> {
+  ): Promise<ResultVO> {
     const { tel, password } = params;
 
     // 0.手机号或密码未输入
@@ -184,7 +184,7 @@ export class AuthService {
   }
 
   // PC 端登录
-  async adminLogin(params: AdminLoginInput): Promise<Result> {
+  async adminLogin(params: AdminLoginDTO): Promise<ResultVO> {
     const { loginType, tel } = params;
     if (!loginType) {
       return {

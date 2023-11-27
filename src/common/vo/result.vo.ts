@@ -17,7 +17,7 @@ import { ClassType } from 'type-graphql';
  */
 
 @ObjectType()
-export class Result {
+export class ResultVO {
   @Field(() => Int)
   code: number;
   @Field(() => String, { nullable: true })
@@ -36,11 +36,11 @@ export interface IResults<T> {
   code: number;
   message?: string;
   data?: T[];
-  pageInfo?: PageInfo;
+  pageInfo?: PageInfoVO;
 }
 
 @ObjectType()
-export class PageInfo {
+export class PageInfoVO {
   @Field(() => Int)
   total: number;
   @Field(() => Int)
@@ -49,12 +49,12 @@ export class PageInfo {
   pageSize?: number;
 }
 
-// 生成 GraphQL Result
-export const createGQLResult = <T>(
+// 生成 GraphQL ResultVO
+export const createGQLResultVO = <T>(
   ItemType: ClassType<T>,
 ): ClassType<IResult<T>> => {
   @ObjectType()
-  class Result {
+  class ResultVO {
     @Field(() => Int)
     code: number;
     @Field(() => String, { nullable: true })
@@ -62,23 +62,23 @@ export const createGQLResult = <T>(
     @Field(() => ItemType, { nullable: true })
     data?: T;
   }
-  return Result;
+  return ResultVO;
 };
 
-// 生成 GraphQL Results
+// 生成 GraphQL ResultsVO
 export const createGQLResults = <T>(
   ItemType: ClassType<T>,
 ): ClassType<IResults<T>> => {
   @ObjectType()
-  class Results {
+  class ResultsVO {
     @Field(() => Int)
     code: number;
     @Field(() => String, { nullable: true })
     message?: string;
     @Field(() => [ItemType], { nullable: true })
     data?: T[];
-    @Field(() => PageInfo, { nullable: true })
-    pageInfo?: PageInfo;
+    @Field(() => PageInfoVO, { nullable: true })
+    pageInfo?: PageInfoVO;
   }
-  return Results;
+  return ResultsVO;
 };
