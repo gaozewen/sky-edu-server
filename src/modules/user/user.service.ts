@@ -23,9 +23,13 @@ export class UserService {
   ) {}
 
   // 新增一个用户
-  async create(entity: DeepPartial<User>): Promise<boolean> {
-    const res = await this.userRepository.insert(entity);
-    return res && res.raw && res.raw.affectedRows > 0;
+  async create(entity: DeepPartial<User>): Promise<User> {
+    const res = await this.userRepository.save(
+      await this.userRepository.create(entity),
+    );
+    console.log('gzw===>res', res);
+    return res;
+    // return res && res.raw && res.raw.affectedRows > 0;
   }
 
   // 删除用户

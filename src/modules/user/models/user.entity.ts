@@ -1,11 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity } from 'typeorm';
+
+import { CommonEntity } from '@/common/entities/common.entity';
 
 @Entity('user')
-export class User {
-  @PrimaryGeneratedColumn('uuid', { comment: '主键' })
-  id: string;
-
+export class User extends CommonEntity {
   @Column({ comment: '账户' })
   account: string;
 
@@ -13,6 +12,7 @@ export class User {
   password: string;
 
   @Column({ comment: '手机号' })
+  @IsNotEmpty()
   tel: string;
 
   @Column({
@@ -22,23 +22,8 @@ export class User {
   avatar: string;
 
   @Column({ comment: '昵称', default: '', length: 100 })
-  @IsNotEmpty()
   nickname: string;
 
   @Column({ comment: '描述信息', default: '' })
   desc: string;
-
-  @Column({
-    name: 'created_at',
-    default: () => 'CURRENT_TIMESTAMP',
-    comment: '创建时间',
-  })
-  createdAt: Date;
-
-  @Column({
-    name: 'updated_at',
-    default: () => 'CURRENT_TIMESTAMP',
-    comment: '修改时间',
-  })
-  updatedAt: Date;
 }

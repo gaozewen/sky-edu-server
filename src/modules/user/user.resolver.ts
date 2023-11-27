@@ -1,7 +1,8 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { DB_ERROR, SUCCESS } from '@/common/constants/code';
+import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { Result } from '@/common/dto/result.type';
 
 import { JwtGqlAuthGuard } from '../auth/auth.guard';
@@ -13,8 +14,8 @@ import { UserService } from './user.service';
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Mutation(() => Boolean, { description: '新增用户' })
-  async create(@Args('params') params: UserInput): Promise<boolean> {
+  @Mutation(() => UserDTO, { description: '新增用户' })
+  async create(@Args('params') params: UserInput): Promise<UserDTO> {
     return await this.userService.create(params);
   }
 
@@ -24,9 +25,8 @@ export class UserResolver {
   }
 
   @Query(() => UserDTO, { description: '使用 JWT 中的 userId 查询用户' })
-  async getUserByJWT(@Context() cxt: any): Promise<UserDTO> {
-    const id = cxt.req.user.id;
-    return await this.userService.findById(id);
+  async getUserByJWT(@JwtUserId() userId: string): Promise<UserDTO> {
+    return await this.userService.findById(userId);
   }
 
   @Mutation(() => Result, { description: '更新用户画像' })

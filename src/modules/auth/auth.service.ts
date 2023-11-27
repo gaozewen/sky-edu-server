@@ -118,16 +118,16 @@ export class AuthService {
     // 3.用户不存在
     if (!user) {
       // 3.1 创建用户
-      const isSuccess = await this.userService.create({
+      const createdUser = await this.userService.create({
         account: tel,
         tel,
       });
       // 3.2 创建成功
-      if (isSuccess) {
+      if (createdUser) {
         return {
           code: SUCCESS,
           message: '登录成功',
-          data: this.genJwtToken(user),
+          data: this.genJwtToken(createdUser),
         };
       }
       // 3.3 创建失败

@@ -8,7 +8,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/create')
-  async create(): Promise<boolean> {
+  async create(): Promise<User> {
     return await this.userService.create({
       account: 'admin',
       password: '123456',
