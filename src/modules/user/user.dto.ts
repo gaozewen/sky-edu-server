@@ -40,3 +40,15 @@ export class ProfileInput {
   @Field()
   desc?: string;
 }
+
+@InputType()
+export class ResetPwdInput {
+  @Field({ description: '用户 ID' })
+  id: string;
+  @Field({ description: '用户手机号' })
+  tel: string;
+  @Field({ description: '手机验证码' })
+  code: string;
+  @Field({ description: '密码' })
+  password: string;
+}

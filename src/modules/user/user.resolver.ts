@@ -5,7 +5,7 @@ import { DB_ERROR, SUCCESS } from '@/common/constants/code';
 import { Result } from '@/common/dto/result.type';
 
 import { JwtGqlAuthGuard } from '../auth/auth.guard';
-import { ProfileInput, UserDTO, UserInput } from './user.dto';
+import { ProfileInput, ResetPwdInput, UserDTO, UserInput } from './user.dto';
 import { UserService } from './user.service';
 
 @Resolver('User')
@@ -46,6 +46,10 @@ export class UserResolver {
       code: DB_ERROR,
       message: '更新失败',
     };
+  }
+  @Mutation(() => Result, { description: '重置用户密码' })
+  async resetPwd(@Args('params') params: ResetPwdInput): Promise<Result> {
+    return await this.userService.resetPwd(params);
   }
 
   @Mutation(() => Boolean, { description: '更新用户' })
