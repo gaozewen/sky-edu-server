@@ -17,3 +17,5 @@ export const ACCOUNT_NOT_EXIST = 10006;
 export const PARAMS_REQUIRED_ERROR = 10007;
 // 密码错误
 export const PASSWORD_ERROR = 10008;
+// 门店信息不存在
+export const STORE_NOT_EXIST = 10009;

@@ -66,7 +66,7 @@ export const createGQLResultVO = <T>(
 };
 
 // 生成 GraphQL ResultsVO
-export const createGQLResults = <T>(
+export const createGQLResultsVO = <T>(
   ItemType: ClassType<T>,
 ): ClassType<IResults<T>> => {
   @ObjectType()

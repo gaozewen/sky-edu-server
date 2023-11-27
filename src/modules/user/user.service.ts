@@ -24,12 +24,10 @@ export class UserService {
 
   // 新增一个用户
   async create(entity: DeepPartial<User>): Promise<User> {
-    const res = await this.userRepository.save(
+    const createdUser = await this.userRepository.save(
       await this.userRepository.create(entity),
     );
-    console.log('gzw===>res', res);
-    return res;
-    // return res && res.raw && res.raw.affectedRows > 0;
+    return createdUser;
   }
 
   // 删除用户

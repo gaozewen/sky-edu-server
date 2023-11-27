@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-export class BaseEntity {
+export class CommonEntity {
   @PrimaryGeneratedColumn('uuid', { comment: '主键' })
   id: string;
 
