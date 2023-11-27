@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class BaseVO {
+export class CommonVO {
   @Field()
   id: string;
 

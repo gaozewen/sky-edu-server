@@ -1,11 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
-import { BaseVO } from '@/common/vo/base.vo';
+import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { StoreImageVO } from '@/modules/storeImage/vo/storeImage.vo';
 
 @ObjectType()
-export class StoreVO extends BaseVO {
+export class StoreVO extends CommonVO {
   @Field({
     description: '营业执照',
   })
