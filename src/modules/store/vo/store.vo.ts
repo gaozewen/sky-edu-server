@@ -7,31 +7,10 @@ import { StoreImageVO } from '@/modules/storeImage/vo/storeImage.vo';
 @ObjectType()
 export class StoreVO extends CommonVO {
   @Field({
-    description: '营业执照',
-  })
-  businessLicense: string;
-
-  @Field({
-    description: '法人身份证正面',
-  })
-  identityCardFrontImg: string;
-
-  @Field({
-    description: '法人身份证反面',
-  })
-  identityCardBackImg: string;
-
-  @Field({
-    description: '标签 以，隔开',
+    description: 'logo',
     nullable: true,
   })
-  tags: string;
-
-  @Field({
-    description: '简介',
-    nullable: true,
-  })
-  description: string;
+  logo: string;
 
   @Field({
     description: '门店名',
@@ -40,10 +19,16 @@ export class StoreVO extends CommonVO {
   name: string;
 
   @Field({
-    description: 'logo',
+    description: '标签 以，隔开',
     nullable: true,
   })
-  logo: string;
+  tags: string;
+
+  @Field({
+    description: '手机号',
+    nullable: true,
+  })
+  tel: string;
 
   @Field({
     description: '经度',
@@ -64,19 +49,34 @@ export class StoreVO extends CommonVO {
   address?: string;
 
   @Field({
-    description: '电话',
+    description: '简介',
     nullable: true,
   })
-  tel: string;
+  description: string;
+
+  @Field({
+    description: '营业执照',
+  })
+  businessLicense: string;
+
+  @Field({
+    description: '法人身份证正面',
+  })
+  identityCardFrontImg: string;
+
+  @Field({
+    description: '法人身份证反面',
+  })
+  identityCardBackImg: string;
 
   @Field(() => [StoreImageVO], { nullable: true, description: '封面图' })
-  frontImg?: StoreImageVO[];
+  frontImgs?: StoreImageVO[];
 
   @Field(() => [StoreImageVO], { nullable: true, description: '室内图' })
-  roomImg?: StoreImageVO[];
+  roomImgs?: StoreImageVO[];
 
   @Field(() => [StoreImageVO], { nullable: true, description: '其他图' })
-  otherImg?: StoreImageVO[];
+  otherImgs?: StoreImageVO[];
 }
 
 @ObjectType()

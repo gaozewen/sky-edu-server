@@ -21,33 +21,35 @@ export class StoreService {
   }
 
   async findById(id: string): Promise<Store> {
-    return this.storeRepository.findOne({
+    const store = await this.storeRepository.findOne({
       where: {
         id,
       },
       relations: ['frontImgs', 'roomImgs', 'otherImgs'],
     });
+
+    return store;
   }
 
   async updateById(id: string, entity: DeepPartial<Store>): Promise<boolean> {
-    // TODO：测试 update store 时，是否会自动加上 updatedAt
-    const res = await this.storeRepository.update(id, entity);
-    if (res.affected > 0) {
+    // 使用 save 方法 update
+    const existEntity = await this.findById(id);
+    if (!existEntity) {
+      return false;
+    }
+
+    const newEntity = {
+      ...existEntity,
+      ...entity,
+    };
+    // Object.assign(existEntity, entity);
+    const res = await this.storeRepository.save(
+      this.storeRepository.create(newEntity),
+    );
+    if (res) {
       return true;
     }
     return false;
-
-    // 使用 save 方法 update
-    // const existEntity = await this.findById(id);
-    // if (!existEntity) {
-    //   return false;
-    // }
-    // Object.assign(existEntity, entity);
-    // const res = await this.storeRepository.save(existEntity);
-    // if (res) {
-    //   return true;
-    // }
-    // return false;
   }
 
   async findStores({

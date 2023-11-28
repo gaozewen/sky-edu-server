@@ -1,15 +1,15 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsInt, Min } from 'class-validator';
 
 @InputType()
 export class PageInfoDTO {
-  @Field()
+  @Field(() => Int)
   @IsInt()
-  @Min(0)
+  @Min(1)
   pageNum: number;
 
-  @Field()
+  @Field(() => Int)
   @IsInt()
-  @Min(0)
+  @Min(1)
   pageSize: number;
 }

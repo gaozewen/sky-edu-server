@@ -84,16 +84,19 @@ export class Store extends CommonEntity {
   // 这个 storeImage.store 代表 1 对 多，在多这个实体类中，哪个字段表示 1
 
   @OneToMany(() => StoreImage, (storeImage) => storeImage.storeForFrontImg, {
+    // eager: true,
     cascade: true,
   })
   frontImgs?: StoreImage[];
 
   @OneToMany(() => StoreImage, (storeImage) => storeImage.storeForRoomImg, {
+    // eager: true,
     cascade: true,
   })
   roomImgs?: StoreImage[];
 
   @OneToMany(() => StoreImage, (storeImage) => storeImage.storeForOtherImg, {
+    // eager: true,
     cascade: true,
   })
   otherImgs?: StoreImage[];

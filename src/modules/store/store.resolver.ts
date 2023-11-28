@@ -23,7 +23,7 @@ export class StoreResolver {
   ) {}
 
   @Query(() => StoreResultVO)
-  async getStoreInfo(@Args('id') id: string): Promise<StoreResultVO> {
+  async getStore(@Args('id') id: string): Promise<StoreResultVO> {
     const result = await this.storeService.findById(id);
     if (result) {
       return {
