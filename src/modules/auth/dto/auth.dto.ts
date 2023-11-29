@@ -12,3 +12,19 @@ export class AdminLoginDTO {
   @Field({ description: '密码', nullable: true })
   password?: string;
 }
+
+@InputType()
+export class StudentLoginDTO {
+  @Field({ description: '学员账号' })
+  account: string;
+  @Field({ description: '密码' })
+  password: string;
+}
+
+@InputType()
+export class StudentRegisterDTO {
+  @Field({ description: '学员账号' })
+  account: string;
+  @Field({ description: '密码' })
+  password: string;
+}

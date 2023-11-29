@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { OSSModule } from './modules/oss/oss.module';
 import { SMSModule } from './modules/sms/sms.module';
 import { StoreModule } from './modules/store/store.module';
+import { StudentModule } from './modules/student/student.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { UserModule } from './modules/user/user.module';
     SMSModule,
     AuthModule,
     StoreModule,
+    StudentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
