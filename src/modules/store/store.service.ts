@@ -61,7 +61,7 @@ export class StoreService {
     length: number;
     where: FindOptionsWhere<Store>;
   }): Promise<[Store[], number]> {
-    return this.storeRepository.findAndCount({
+    return await this.storeRepository.findAndCount({
       take: length,
       skip: start,
       order: {
