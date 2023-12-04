@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
+import { CourseModule } from './modules/course/course.module';
 import { OSSModule } from './modules/oss/oss.module';
 import { SMSModule } from './modules/sms/sms.module';
 import { StoreModule } from './modules/store/store.module';
@@ -41,6 +42,7 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     StoreModule,
     StudentModule,
+    CourseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

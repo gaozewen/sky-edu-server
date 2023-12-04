@@ -21,3 +21,5 @@ export const PASSWORD_ERROR = 10008;
 export const STORE_NOT_EXIST = 10009;
 // 账户已在
 export const ACCOUNT_EXIST = 10010;
+// 课程信息不存在
+export const COURSE_NOT_EXIST = 10011;
