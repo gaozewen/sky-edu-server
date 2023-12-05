@@ -9,7 +9,7 @@ import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
 import { CourseService } from './course.service';
-import { CourseDTO } from './dto/course.dto';
+import { PartialCourseDTO } from './dto/course.dto';
 import { Course } from './models/course.entity';
 import { CourseResultsVO, CourseResultVO, CourseVO } from './vo/course.vo';
 
@@ -36,7 +36,7 @@ export class CourseResolver {
 
   @Mutation(() => ResultVO)
   async commitCourse(
-    @Args('params') params: CourseDTO,
+    @Args('params') params: PartialCourseDTO,
     @JwtUserId() userId: string,
     // @CurOrgId() storeId: string,
     @Args('id', { nullable: true }) id: string,

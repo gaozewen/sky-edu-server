@@ -4,6 +4,37 @@ import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 
 @ObjectType()
+class OrderTimeVO {
+  @Field({
+    description: 'ID',
+  })
+  id: string;
+
+  @Field({
+    description: '开始时间',
+  })
+  startTime: string;
+
+  @Field({
+    description: '结束时间',
+  })
+  endTime: string;
+}
+
+@ObjectType()
+export class WeekOrderTimeVO {
+  @Field({
+    description: '周几',
+  })
+  week: string;
+
+  @Field(() => [OrderTimeVO], {
+    description: '当天可预约时间',
+  })
+  orderTimes: OrderTimeVO[];
+}
+
+@ObjectType()
 export class CourseVO extends CommonVO {
   @Field({
     description: '课程名称',
@@ -53,6 +84,12 @@ export class CourseVO extends CommonVO {
     nullable: true,
   })
   otherInfo: string;
+
+  @Field(() => [WeekOrderTimeVO], {
+    description: '一周内可约时间',
+    nullable: true,
+  })
+  weeklyOrderTimes: WeekOrderTimeVO[];
 }
 
 @ObjectType()
