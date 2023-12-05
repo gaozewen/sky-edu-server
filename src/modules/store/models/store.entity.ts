@@ -2,6 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 import { CommonEntity } from '@/common/entities/common.entity';
+import { Course } from '@/modules/course/models/course.entity';
 import { StoreImage } from '@/modules/storeImage/models/storeImage.entity';
 
 @Entity('store')
@@ -100,4 +101,10 @@ export class Store extends CommonEntity {
     cascade: true,
   })
   otherImgs?: StoreImage[];
+
+  @OneToMany(() => Course, (course) => course.store, {
+    // eager: true,
+    cascade: true,
+  })
+  courses?: Course[];
 }

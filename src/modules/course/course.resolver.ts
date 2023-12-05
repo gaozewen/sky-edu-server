@@ -3,6 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FindOptionsWhere, Like } from 'typeorm';
 
 import { COURSE_NOT_EXIST, DB_ERROR, SUCCESS } from '@/common/constants/code';
+import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
@@ -38,16 +39,16 @@ export class CourseResolver {
   async commitCourse(
     @Args('params') params: PartialCourseDTO,
     @JwtUserId() userId: string,
-    // @CurOrgId() storeId: string,
+    @CurStoreId() storeId: string,
     @Args('id', { nullable: true }) id: string,
   ): Promise<ResultVO> {
     if (!id) {
       const res = await this.courseService.create({
         ...params,
         createdBy: userId,
-        // store: {
-        //   id: storeId,
-        // },
+        store: {
+          id: storeId,
+        },
       });
       if (res) {
         return {
@@ -87,15 +88,15 @@ export class CourseResolver {
   async getCourses(
     @Args('pageInfo') pageInfo: PageInfoDTO,
     @JwtUserId() userId: string,
-    // @CurOrgId() storeId: string,
+    @CurStoreId() storeId: string,
     @Args('name', { nullable: true }) name?: string,
   ): Promise<CourseResultsVO> {
     const { pageNum, pageSize } = pageInfo;
     const where: FindOptionsWhere<Course> = {
       createdBy: userId,
-      // store: {
-      //   id: storeId,
-      // },
+      store: {
+        id: storeId,
+      },
     };
     if (name) {
       where.name = Like(`%${name}%`);
