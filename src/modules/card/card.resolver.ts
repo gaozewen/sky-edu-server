@@ -5,7 +5,6 @@ import { FindOptionsWhere, Like } from 'typeorm';
 import { CARD_NOT_EXIST, DB_ERROR, SUCCESS } from '@/common/constants/code';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
-import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
@@ -90,13 +89,11 @@ export class CardResolver {
 
   @Query(() => CardResultsVO)
   async getCards(
-    @Args('pageInfo') pageInfo: PageInfoDTO,
     @Args('courseId') courseId: string,
     @JwtUserId() userId: string,
     @CurStoreId() storeId: string,
     @Args('name', { nullable: true }) name?: string,
   ): Promise<CardResultsVO> {
-    const { pageNum, pageSize } = pageInfo;
     const where: FindOptionsWhere<Card> = {
       createdBy: userId,
       course: {
@@ -109,19 +106,12 @@ export class CardResolver {
     if (name) {
       where.name = Like(`%${name}%`);
     }
-    const [results, total] = await this.cardService.findCards({
-      start: pageNum === 1 ? 0 : (pageNum - 1) * pageSize,
-      length: pageSize,
+    const [results] = await this.cardService.findCards({
       where,
     });
     return {
       code: SUCCESS,
       data: results,
-      pageInfo: {
-        pageNum,
-        pageSize,
-        total,
-      },
       message: '获取成功',
     };
   }

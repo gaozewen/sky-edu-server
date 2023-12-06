@@ -44,20 +44,14 @@ export class CardService {
   }
 
   async findCards({
-    start,
-    length,
     where,
   }: {
-    start: number;
-    length: number;
     where: FindOptionsWhere<Card>;
   }): Promise<[Card[], number]> {
     return this.cardRepository.findAndCount({
-      take: length,
-      skip: start,
       where,
       order: {
-        createdAt: 'DESC',
+        createdAt: 'ASC',
       },
     });
   }
