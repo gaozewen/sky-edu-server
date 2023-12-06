@@ -1,0 +1,57 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeepPartial, Repository } from 'typeorm';
+
+import { {{pascalCase name}} } from './models/{{kebabCase name}}.entity';
+
+@Injectable()
+export class {{pascalCase name}}Service {
+  constructor(
+    @InjectRepository({{pascalCase name}})
+    private readonly {{kebabCase name}}Repository: Repository<{{pascalCase name}}>,
+  ) {}
+
+  // 新增一个学员
+  async create(entity: DeepPartial<{{pascalCase name}}>): Promise<{{pascalCase name}}> {
+    const created{{pascalCase name}} = await this.{{kebabCase name}}Repository.save(
+      this.{{kebabCase name}}Repository.create(entity),
+    );
+    return created{{pascalCase name}};
+  }
+
+  // 修改学员信息
+  async updateById(id: string, entity: DeepPartial<{{pascalCase name}}>): Promise<boolean> {
+    const res = await this.{{kebabCase name}}Repository.update(id, entity);
+    return res && res.affected > 0;
+  }
+
+  // 通过 ID 查找学员
+  async findById(id: string): Promise<{{pascalCase name}}> {
+    return await this.{{kebabCase name}}Repository.findOne({
+      where: { id },
+    });
+  }
+
+  // 通过账户查找学员
+  async findByAccount(account: string): Promise<{{pascalCase name}}> {
+    return await this.{{kebabCase name}}Repository.findOne({
+      where: { account },
+    });
+  }
+
+  async find{{pascalCase name}}s({
+    start,
+    length,
+  }: {
+    start: number;
+    length: number;
+  }): Promise<[{{pascalCase name}}[], number]> {
+    return await this.{{kebabCase name}}Repository.findAndCount({
+      take: length,
+      skip: start,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+  }
+}

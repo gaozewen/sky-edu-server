@@ -1,0 +1,65 @@
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+
+import { ACCOUNT_NOT_EXIST, SUCCESS } from '@/common/constants/code';
+import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
+import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
+import { ResultVO } from '@/common/vo/result.vo';
+
+import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
+import { {{pascalCase name}}DTO } from './dto/{{kebabCase name}}.dto';
+import { {{pascalCase name}}Service } from './{{kebabCase name}}.service';
+import { {{pascalCase name}}ResultsVO, {{pascalCase name}}VO } from './vo/{{kebabCase name}}.vo';
+
+@Resolver(() => {{pascalCase name}}VO)
+@UseGuards(JwtGqlAuthGuard)
+export class {{pascalCase name}}Resolver {
+  constructor(private readonly {{kebabCase name}}Service: {{pascalCase name}}Service) {}
+
+  @Query(() => {{pascalCase name}}VO)
+  async get{{pascalCase name}}ByJWT(@JwtUserId() id: string): Promise<{{pascalCase name}}VO> {
+    return await this.{{kebabCase name}}Service.findById(id);
+  }
+
+  @Mutation(() => ResultVO)
+  async commit{{pascalCase name}}(
+    @JwtUserId() userId: string,
+    @Args('params') params: {{pascalCase name}}DTO,
+  ): Promise<ResultVO> {
+    const {{kebabCase name}} = await this.{{kebabCase name}}Service.findById(userId);
+    if ({{kebabCase name}}) {
+      const res = await this.{{kebabCase name}}Service.updateById({{kebabCase name}}.id, params);
+      if (res) {
+        return {
+          code: SUCCESS,
+          message: '更新成功',
+        };
+      }
+    }
+    return {
+      code: ACCOUNT_NOT_EXIST,
+      message: '账户不存在',
+    };
+  }
+
+  @Query(() => {{pascalCase name}}ResultsVO)
+  async get{{pascalCase name}}s(
+    @Args('pageInfo') pageInfo: PageInfoDTO,
+  ): Promise<{{pascalCase name}}ResultsVO> {
+    const { pageNum, pageSize } = pageInfo;
+    const [results, total] = await this.{{kebabCase name}}Service.find{{pascalCase name}}s({
+      start: pageNum === 1 ? 0 : (pageNum - 1) * pageSize,
+      length: pageSize,
+    });
+    return {
+      code: SUCCESS,
+      data: results,
+      pageInfo: {
+        pageNum,
+        pageSize,
+        total,
+      },
+      message: '获取成功',
+    };
+  }
+}
