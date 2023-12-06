@@ -1,4 +1,4 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, PartialType } from '@nestjs/graphql';
 
 @InputType()
 export class ProductDTO {
@@ -46,4 +46,13 @@ export class ProductDTO {
     nullable: true,
   })
   preferentialPrice: number;
+
+  @Field(() => [String], {
+    description: '商品绑定的消费卡',
+    nullable: true,
+  })
+  cardIds: string[];
 }
+
+@InputType()
+export class PartialProductDTO extends PartialType(ProductDTO) {}

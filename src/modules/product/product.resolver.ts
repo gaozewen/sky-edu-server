@@ -9,7 +9,7 @@ import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
-import { ProductDTO } from './dto/product.dto';
+import { PartialProductDTO } from './dto/product.dto';
 import { Product } from './models/product.entity';
 import { ProductService } from './product.service';
 import { ProductResultsVO, ProductResultVO, ProductVO } from './vo/product.vo';
@@ -37,7 +37,7 @@ export class ProductResolver {
 
   @Mutation(() => ResultVO)
   async commitProduct(
-    @Args('params') params: ProductDTO,
+    @Args('params') params: PartialProductDTO,
     @JwtUserId() userId: string,
     @CurStoreId() storeId: string,
     @Args('id', { nullable: true }) id: string,
@@ -49,6 +49,7 @@ export class ProductResolver {
         store: {
           id: storeId,
         },
+        cards: [],
       });
       if (res) {
         return {
@@ -63,9 +64,12 @@ export class ProductResolver {
     }
     const product = await this.productService.findById(id);
     if (product) {
+      const { cardIds } = params;
       const res = await this.productService.updateById(product.id, {
         ...params,
         updatedBy: userId,
+        cards:
+          cardIds && cardIds.length > 0 ? cardIds.map((i) => ({ id: i })) : [],
       });
       if (res) {
         return {

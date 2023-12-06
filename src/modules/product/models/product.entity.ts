@@ -1,7 +1,15 @@
 import { IsNotEmpty, Min } from 'class-validator';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+} from 'typeorm';
 
 import { CommonEntity } from '@/common/entities/common.entity';
+import { Card } from '@/modules/card/models/card.entity';
 import { Store } from '@/modules/store/models/store.entity';
 
 export enum ProductType {
@@ -93,4 +101,15 @@ export class Product extends CommonEntity {
   })
   @JoinColumn({ name: 'store_id' })
   store: Store;
+
+  // 商品绑定的消费卡
+  @ManyToMany(() => Card, {
+    cascade: true,
+  })
+  @JoinTable({
+    name: 'product_card',
+    joinColumns: [{ name: 'product_id' }],
+    inverseJoinColumns: [{ name: 'card_id' }],
+  })
+  cards: Card[];
 }

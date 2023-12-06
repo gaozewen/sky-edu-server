@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
+import { CardVO } from '@/modules/card/vo/card.vo';
 import { StoreVO } from '@/modules/store/vo/store.vo';
 
 @ObjectType()
@@ -67,6 +68,12 @@ export class ProductVO extends CommonVO {
     description: '门店',
   })
   store: StoreVO;
+
+  @Field(() => [CardVO], {
+    description: '商品绑定的消费卡',
+    nullable: true,
+  })
+  cards?: CardVO[];
 }
 
 @ObjectType()
