@@ -25,3 +25,5 @@ export const ACCOUNT_EXIST = 10010;
 export const COURSE_NOT_EXIST = 10011;
 // 消费卡信息不存在
 export const CARD_NOT_EXIST = 10012;
+// 商品信息不存在
+export const PRODUCT_NOT_EXIST = 10013;

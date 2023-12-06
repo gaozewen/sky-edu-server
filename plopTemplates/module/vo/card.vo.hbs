@@ -1,17 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { CourseVO } from '@/modules/course/vo/course.vo';
 
 import { {{pascalCase name}}Type } from '../models/{{kebabCase name}}.entity';
 
 @ObjectType()
-export class {{pascalCase name}}VO {
-  @Field({
-    description: 'id',
-  })
-  id: string;
-
+export class {{pascalCase name}}VO  extends CommonVO  {
   @Field({
     description: '消费卡名称',
   })

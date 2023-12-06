@@ -4,6 +4,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Card } from '@/modules/card/models/card.entity';
 import { Course } from '@/modules/course/models/course.entity';
+import { Product } from '@/modules/product/models/product.entity';
 import { StoreImage } from '@/modules/storeImage/models/storeImage.entity';
 
 @Entity('store')
@@ -111,4 +112,7 @@ export class Store extends CommonEntity {
 
   @OneToMany(() => Card, (card) => card.store)
   cards: Card[];
+
+  @OneToMany(() => Product, (product) => product.store)
+  products: Product[];
 }

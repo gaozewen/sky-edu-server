@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CardModule } from './modules/card/card.module';
 import { CourseModule } from './modules/course/course.module';
 import { OSSModule } from './modules/oss/oss.module';
+import { ProductModule } from './modules/product/product.module';
 import { SMSModule } from './modules/sms/sms.module';
 import { StoreModule } from './modules/store/store.module';
 import { StudentModule } from './modules/student/student.module';
@@ -45,6 +46,7 @@ import { UserModule } from './modules/user/user.module';
     StudentModule,
     CourseModule,
     CardModule,
+    ProductModule,
   ],
   controllers: [AppController],
   providers: [AppService],
