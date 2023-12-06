@@ -2,26 +2,26 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FindOptionsWhere, Like } from 'typeorm';
 
-import { COURSE_NOT_EXIST, DB_ERROR, SUCCESS } from '@/common/constants/code';
+import { CARD_NOT_EXIST, DB_ERROR, SUCCESS } from '@/common/constants/code';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
-import { CourseService } from './course.service';
-import { PartialCourseDTO } from './dto/course.dto';
-import { Course } from './models/course.entity';
-import { CourseResultsVO, CourseResultVO, CourseVO } from './vo/course.vo';
+import { CardService } from './card.service';
+import { CardDTO } from './dto/card.dto';
+import { Card } from './models/card.entity';
+import { CardResultsVO, CardResultVO, CardVO } from './vo/card.vo';
 
-@Resolver(() => CourseVO)
+@Resolver(() => CardVO)
 @UseGuards(JwtGqlAuthGuard)
-export class CourseResolver {
-  constructor(private readonly courseService: CourseService) {}
+export class CardResolver {
+  constructor(private readonly cardService: CardService) {}
 
-  @Query(() => CourseResultVO)
-  async getCourse(@Args('id') id: string): Promise<CourseResultVO> {
-    const result = await this.courseService.findById(id);
+  @Query(() => CardResultVO)
+  async getCard(@Args('id') id: string): Promise<CardResultVO> {
+    const result = await this.cardService.findById(id);
     if (result) {
       return {
         code: SUCCESS,
@@ -30,22 +30,26 @@ export class CourseResolver {
       };
     }
     return {
-      code: COURSE_NOT_EXIST,
-      message: '课程信息不存在',
+      code: CARD_NOT_EXIST,
+      message: '消费卡信息不存在',
     };
   }
 
   @Mutation(() => ResultVO)
-  async commitCourse(
-    @Args('params') params: PartialCourseDTO,
+  async commitCard(
+    @Args('params') params: CardDTO,
+    @Args('courseId') courseId: string,
     @JwtUserId() userId: string,
     @CurStoreId() storeId: string,
     @Args('id', { nullable: true }) id: string,
   ): Promise<ResultVO> {
     if (!id) {
-      const res = await this.courseService.create({
+      const res = await this.cardService.create({
         ...params,
         createdBy: userId,
+        course: {
+          id: courseId,
+        },
         store: {
           id: storeId,
         },
@@ -61,9 +65,9 @@ export class CourseResolver {
         message: '创建失败',
       };
     }
-    const course = await this.courseService.findById(id);
-    if (course) {
-      const res = await this.courseService.updateById(course.id, {
+    const card = await this.cardService.findById(id);
+    if (card) {
+      const res = await this.cardService.updateById(card.id, {
         ...params,
         updatedBy: userId,
       });
@@ -79,21 +83,25 @@ export class CourseResolver {
       };
     }
     return {
-      code: COURSE_NOT_EXIST,
-      message: '课程信息不存在',
+      code: CARD_NOT_EXIST,
+      message: '消费卡信息不存在',
     };
   }
 
-  @Query(() => CourseResultsVO)
-  async getCourses(
+  @Query(() => CardResultsVO)
+  async getCards(
     @Args('pageInfo') pageInfo: PageInfoDTO,
+    @Args('courseId') courseId: string,
     @JwtUserId() userId: string,
     @CurStoreId() storeId: string,
     @Args('name', { nullable: true }) name?: string,
-  ): Promise<CourseResultsVO> {
+  ): Promise<CardResultsVO> {
     const { pageNum, pageSize } = pageInfo;
-    const where: FindOptionsWhere<Course> = {
+    const where: FindOptionsWhere<Card> = {
       createdBy: userId,
+      course: {
+        id: courseId,
+      },
       store: {
         id: storeId,
       },
@@ -101,7 +109,7 @@ export class CourseResolver {
     if (name) {
       where.name = Like(`%${name}%`);
     }
-    const [results, total] = await this.courseService.findCourses({
+    const [results, total] = await this.cardService.findCards({
       start: pageNum === 1 ? 0 : (pageNum - 1) * pageSize,
       length: pageSize,
       where,
@@ -119,13 +127,13 @@ export class CourseResolver {
   }
 
   @Mutation(() => ResultVO)
-  async deleteCourse(
+  async deleteCard(
     @Args('id') id: string,
     @JwtUserId() userId: string,
   ): Promise<ResultVO> {
-    const result = await this.courseService.findById(id);
+    const result = await this.cardService.findById(id);
     if (result) {
-      const delRes = await this.courseService.deleteById(id, userId);
+      const delRes = await this.cardService.deleteById(id, userId);
       if (delRes) {
         return {
           code: SUCCESS,
@@ -138,8 +146,8 @@ export class CourseResolver {
       };
     }
     return {
-      code: COURSE_NOT_EXIST,
-      message: '课程信息不存在',
+      code: CARD_NOT_EXIST,
+      message: '消费卡信息不存在',
     };
   }
 }

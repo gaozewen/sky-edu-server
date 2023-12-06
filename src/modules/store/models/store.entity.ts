@@ -2,6 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 import { CommonEntity } from '@/common/entities/common.entity';
+import { Card } from '@/modules/card/models/card.entity';
 import { Course } from '@/modules/course/models/course.entity';
 import { StoreImage } from '@/modules/storeImage/models/storeImage.entity';
 
@@ -107,4 +108,7 @@ export class Store extends CommonEntity {
     cascade: true,
   })
   courses?: Course[];
+
+  @OneToMany(() => Card, (card) => card.store)
+  cards: Card[];
 }

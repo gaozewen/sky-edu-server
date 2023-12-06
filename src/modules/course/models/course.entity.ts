@@ -1,7 +1,8 @@
 import { IsInt, IsNotEmpty, Min } from 'class-validator';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 import { CommonEntity } from '@/common/entities/common.entity';
+import { Card } from '@/modules/card/models/card.entity';
 import { Store } from '@/modules/store/models/store.entity';
 
 import { WeekOrderTimeVO } from '../vo/course.vo';
@@ -80,4 +81,7 @@ export class Course extends CommonEntity {
   @ManyToOne(() => Store, (store) => store.courses)
   @JoinColumn({ name: 'store_id' })
   store: Store;
+
+  @OneToMany(() => Card, (card) => card.course)
+  cards: Card[];
 }
