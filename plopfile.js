@@ -20,7 +20,7 @@ module.exports = (plop) => {
         ),
         templateFile: path.join(
           __dirname,
-          'plopTemplates/module/student.module.hbs',
+          'plopTemplates/module/card.module.hbs',
         ),
       },
       {
@@ -31,7 +31,7 @@ module.exports = (plop) => {
         ),
         templateFile: path.join(
           __dirname,
-          'plopTemplates/module/student.service.hbs',
+          'plopTemplates/module/card.service.hbs',
         ),
       },
       {
@@ -42,7 +42,7 @@ module.exports = (plop) => {
         ),
         templateFile: path.join(
           __dirname,
-          'plopTemplates/module/student.resolver.hbs',
+          'plopTemplates/module/card.resolver.hbs',
         ),
       },
       {
@@ -53,7 +53,7 @@ module.exports = (plop) => {
         ),
         templateFile: path.join(
           __dirname,
-          'plopTemplates/module/models/student.entity.hbs',
+          'plopTemplates/module/models/card.entity.hbs',
         ),
       },
       {
@@ -64,7 +64,7 @@ module.exports = (plop) => {
         ),
         templateFile: path.join(
           __dirname,
-          'plopTemplates/module/dto/student.dto.hbs',
+          'plopTemplates/module/dto/card.dto.hbs',
         ),
       },
       {
@@ -75,7 +75,7 @@ module.exports = (plop) => {
         ),
         templateFile: path.join(
           __dirname,
-          'plopTemplates/module/vo/student.vo.hbs',
+          'plopTemplates/module/vo/card.vo.hbs',
         ),
       },
       {

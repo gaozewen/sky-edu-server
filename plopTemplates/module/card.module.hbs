@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { {{pascalCase name}} } from './models/{{kebabCase name}}.entity';
 import { {{pascalCase name}}Resolver } from './{{kebabCase name}}.resolver';
 import { {{pascalCase name}}Service } from './{{kebabCase name}}.service';
+import { {{pascalCase name}} } from './models/{{kebabCase name}}.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([{{pascalCase name}}])],

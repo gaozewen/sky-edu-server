@@ -1,0 +1,153 @@
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { FindOptionsWhere, Like } from 'typeorm';
+
+import { CARD_NOT_EXIST, DB_ERROR, SUCCESS } from '@/common/constants/code';
+import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
+import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
+import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
+import { ResultVO } from '@/common/vo/result.vo';
+
+import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
+import { {{pascalCase name}}Service } from './{{kebabCase name}}.service';
+import { {{pascalCase name}}DTO } from './dto/{{kebabCase name}}.dto';
+import { {{pascalCase name}} } from './models/{{kebabCase name}}.entity';
+import { {{pascalCase name}}ResultsVO, {{pascalCase name}}ResultVO, {{pascalCase name}}VO } from './vo/{{kebabCase name}}.vo';
+
+@Resolver(() => {{pascalCase name}}VO)
+@UseGuards(JwtGqlAuthGuard)
+export class {{pascalCase name}}Resolver {
+  constructor(private readonly {{kebabCase name}}Service: {{pascalCase name}}Service) {}
+
+  @Query(() => {{pascalCase name}}ResultVO)
+  async get{{pascalCase name}}(@Args('id') id: string): Promise<{{pascalCase name}}ResultVO> {
+    const result = await this.{{kebabCase name}}Service.findById(id);
+    if (result) {
+      return {
+        code: SUCCESS,
+        data: result,
+        message: '获取成功',
+      };
+    }
+    return {
+      code: CARD_NOT_EXIST,
+      message: '消费卡信息不存在',
+    };
+  }
+
+  @Mutation(() => ResultVO)
+  async commit{{pascalCase name}}(
+    @Args('params') params: {{pascalCase name}}DTO,
+    @Args('courseId') courseId: string,
+    @JwtUserId() userId: string,
+    @CurStoreId() storeId: string,
+    @Args('id', { nullable: true }) id: string,
+  ): Promise<ResultVO> {
+    if (!id) {
+      const res = await this.{{kebabCase name}}Service.create({
+        ...params,
+        createdBy: userId,
+        course: {
+          id: courseId,
+        },
+        store: {
+          id: storeId,
+        },
+      });
+      if (res) {
+        return {
+          code: SUCCESS,
+          message: '创建成功',
+        };
+      }
+      return {
+        code: DB_ERROR,
+        message: '创建失败',
+      };
+    }
+    const {{kebabCase name}} = await this.{{kebabCase name}}Service.findById(id);
+    if ({{kebabCase name}}) {
+      const res = await this.{{kebabCase name}}Service.updateById({{kebabCase name}}.id, {
+        ...params,
+        updatedBy: userId,
+      });
+      if (res) {
+        return {
+          code: SUCCESS,
+          message: '更新成功',
+        };
+      }
+      return {
+        code: DB_ERROR,
+        message: '更新失败',
+      };
+    }
+    return {
+      code: CARD_NOT_EXIST,
+      message: '消费卡信息不存在',
+    };
+  }
+
+  @Query(() => {{pascalCase name}}ResultsVO)
+  async get{{pascalCase name}}s(
+    @Args('pageInfo') pageInfo: PageInfoDTO,
+    @Args('courseId') courseId: string,
+    @JwtUserId() userId: string,
+    @CurStoreId() storeId: string,
+    @Args('name', { nullable: true }) name?: string,
+  ): Promise<{{pascalCase name}}ResultsVO> {
+    const { pageNum, pageSize } = pageInfo;
+    const where: FindOptionsWhere<{{pascalCase name}}> = {
+      createdBy: userId,
+      course: {
+        id: courseId,
+      },
+      store: {
+        id: storeId,
+      },
+    };
+    if (name) {
+      where.name = Like(`%${name}%`);
+    }
+    const [results, total] = await this.{{kebabCase name}}Service.find{{pascalCase name}}s({
+      start: pageNum === 1 ? 0 : (pageNum - 1) * pageSize,
+      length: pageSize,
+      where,
+    });
+    return {
+      code: SUCCESS,
+      data: results,
+      pageInfo: {
+        pageNum,
+        pageSize,
+        total,
+      },
+      message: '获取成功',
+    };
+  }
+
+  @Mutation(() => ResultVO)
+  async delete{{pascalCase name}}(
+    @Args('id') id: string,
+    @JwtUserId() userId: string,
+  ): Promise<ResultVO> {
+    const result = await this.{{kebabCase name}}Service.findById(id);
+    if (result) {
+      const delRes = await this.{{kebabCase name}}Service.deleteById(id, userId);
+      if (delRes) {
+        return {
+          code: SUCCESS,
+          message: '删除成功',
+        };
+      }
+      return {
+        code: DB_ERROR,
+        message: '删除失败',
+      };
+    }
+    return {
+      code: CARD_NOT_EXIST,
+      message: '消费卡信息不存在',
+    };
+  }
+}

@@ -1,0 +1,27 @@
+import { Field, InputType } from '@nestjs/graphql';
+
+import { {{pascalCase name}}Type } from '../models/{{kebabCase name}}.entity';
+
+@InputType()
+export class {{pascalCase name}}DTO {
+  @Field({
+    description: '消费卡名称',
+  })
+  name: string;
+
+  @Field({
+    description: '消费卡类型 次数：time 时长：duration',
+  })
+  type: {{pascalCase name}}Type;
+
+  @Field({
+    description: '上课次数',
+    nullable: true,
+  })
+  time: number;
+
+  @Field({
+    description: ' 有效期（天）',
+  })
+  validateDay: number;
+}
