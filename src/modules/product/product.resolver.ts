@@ -11,7 +11,7 @@ import { ResultVO } from '@/common/vo/result.vo';
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
 import { PRODUCT_CATEGORIES } from './constants/product.category';
 import { PartialProductDTO } from './dto/product.dto';
-import { Product } from './models/product.entity';
+import { Product, ProductStatus } from './models/product.entity';
 import { ProductService } from './product.service';
 import {
   ProductCategoryResultsVO,
@@ -55,6 +55,7 @@ export class ProductResolver {
         store: {
           id: storeId,
         },
+        status: ProductStatus.UN_LIST,
         cards: [],
       });
       if (res) {
@@ -119,6 +120,58 @@ export class ProductResolver {
     return {
       code: SUCCESS,
       data: results,
+      pageInfo: {
+        pageNum,
+        pageSize,
+        total,
+      },
+      message: '获取成功',
+    };
+  }
+
+  @Query(() => ProductResultsVO)
+  async getProductsForH5(
+    @Args('pageInfo') pageInfo: PageInfoDTO,
+    @Args('longitude') longitude: number, // 经度
+    @Args('latitude') latitude: number, // 纬度
+    @Args('category', { nullable: true }) category?: string,
+    @Args('name', { nullable: true }) name?: string,
+  ): Promise<ProductResultsVO> {
+    const { pageNum, pageSize } = pageInfo;
+    const where: FindOptionsWhere<Product> = {
+      status: ProductStatus.LIST,
+    };
+    if (category) {
+      where.category = category;
+    }
+    if (name) {
+      where.name = name;
+    }
+    const [{ entities, raw }, total] = await Promise.all([
+      this.productService.findProductsOrderByDistance({
+        start: pageNum === 1 ? 0 : (pageNum - 1) * pageSize,
+        length: pageSize,
+        where,
+        position: {
+          longitude,
+          latitude,
+        },
+      }),
+      this.productService.getCount({ where }),
+    ]);
+
+    return {
+      code: SUCCESS,
+      data: entities.map((i, index) => {
+        const distance = raw[index].distance;
+        let distanceLabel = '>5km';
+        if (distance >= 0 && distance <= 1000) {
+          distanceLabel = `${parseInt(distance.toString())}m`;
+        } else if (distance > 1000 && distance <= 5000) {
+          distanceLabel = `${(distance / 1000).toFixed(2)}km`;
+        }
+        return { ...i, distance: distanceLabel };
+      }),
       pageInfo: {
         pageNum,
         pageSize,

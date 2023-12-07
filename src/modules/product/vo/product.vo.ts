@@ -21,6 +21,12 @@ export class ProductVO extends CommonVO {
   desc: string;
 
   @Field({
+    description: '距离',
+    nullable: true,
+  })
+  distance?: string;
+
+  @Field({
     description: '商品品类',
     nullable: true,
   })

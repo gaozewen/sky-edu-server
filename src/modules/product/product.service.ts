@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 
-import { Product } from './models/product.entity';
+import { Product, ProductStatus } from './models/product.entity';
 
 @Injectable()
 export class ProductService {
@@ -63,6 +63,50 @@ export class ProductService {
     });
   }
 
+  /**
+   * 按用户手机端坐标由近及远排序
+   */
+  async findProductsOrderByDistance({
+    start,
+    length,
+    where,
+    position,
+  }: {
+    start: number;
+    length: number;
+    where: FindOptionsWhere<Product>;
+    position: {
+      longitude: number;
+      latitude: number;
+    };
+  }): Promise<{ entities: Product[]; raw: any[] }> {
+    return (
+      this.productRepository
+        .createQueryBuilder('product')
+        .select('product')
+        .addSelect(
+          `
+          ST_Distance(
+            ST_GeomFromText('POINT(${position.latitude} ${position.longitude})', 4326),
+            ST_GeomFromText(CONCAT('POINT(', store.latitude, ' ', store.longitude, ')'), 4326)
+          )
+        `,
+          'distance',
+        )
+        // 关联的字段是 product.store, 关联的表是 store 表
+        .innerJoinAndSelect('product.store', 'store')
+        .where(`product.status = '${ProductStatus.LIST}'`)
+        .andWhere(`product.name LIKE '%${where.name || ''}%'`)
+        .andWhere(
+          where.category ? `product.category = '${where.category}'` : '1=1',
+        )
+        .orderBy('distance', 'ASC')
+        .skip(start)
+        .take(length)
+        .getRawAndEntities()
+    );
+  }
+
   async deleteById(id: string, userId: string): Promise<boolean> {
     const res1 = await this.productRepository.update(id, {
       deletedBy: userId,
@@ -74,5 +118,13 @@ export class ProductService {
       }
     }
     return false;
+  }
+
+  async getCount({
+    where,
+  }: {
+    where: FindOptionsWhere<Product>;
+  }): Promise<number> {
+    return this.productRepository.count({ where });
   }
 }
