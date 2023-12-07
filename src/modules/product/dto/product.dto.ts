@@ -1,5 +1,7 @@
 import { Field, InputType, PartialType } from '@nestjs/graphql';
 
+import { ProductStatus } from '../models/product.entity';
+
 @InputType()
 export class ProductDTO {
   @Field({
@@ -12,6 +14,17 @@ export class ProductDTO {
     nullable: true,
   })
   desc: string;
+
+  @Field({
+    description: '商品品类',
+    nullable: true,
+  })
+  category: string;
+
+  @Field({
+    description: '上下架状态',
+  })
+  status: ProductStatus;
 
   @Field({
     description: '库存总数',

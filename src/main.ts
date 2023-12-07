@@ -8,6 +8,8 @@ async function bootstrap() {
     origin: [
       'http://localhost:5173',
       'http://localhost:5174',
+      'http://192.168.2.23:5174',
+      'http://192.168.1.100:5174',
       'https://sky-edu-api.gaozewen.com/graphql',
     ],
     // 仅支持 graphql 的 post 请求

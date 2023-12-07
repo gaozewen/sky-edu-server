@@ -5,6 +5,8 @@ import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { CardVO } from '@/modules/card/vo/card.vo';
 import { StoreVO } from '@/modules/store/vo/store.vo';
 
+import { ProductStatus } from '../models/product.entity';
+
 @ObjectType()
 export class ProductVO extends CommonVO {
   @Field({
@@ -17,6 +19,17 @@ export class ProductVO extends CommonVO {
     nullable: true,
   })
   desc: string;
+
+  @Field({
+    description: '商品品类',
+    nullable: true,
+  })
+  category: string;
+
+  @Field({
+    description: '上下架状态',
+  })
+  status: ProductStatus;
 
   @Field({
     description: '库存总数',
@@ -77,7 +90,26 @@ export class ProductVO extends CommonVO {
 }
 
 @ObjectType()
+export class ProductCategoryVO {
+  @Field({
+    description: 'key',
+  })
+  key: string;
+
+  @Field({
+    description: '品类名称',
+    nullable: true,
+  })
+  title: string;
+}
+
+@ObjectType()
 export class ProductResultVO extends createGQLResultVO(ProductVO) {}
 
 @ObjectType()
 export class ProductResultsVO extends createGQLResultsVO(ProductVO) {}
+
+@ObjectType()
+export class ProductCategoryResultsVO extends createGQLResultsVO(
+  ProductCategoryVO,
+) {}

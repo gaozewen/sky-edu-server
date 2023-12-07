@@ -9,10 +9,16 @@ import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
+import { PRODUCT_CATEGORIES } from './constants/product.category';
 import { PartialProductDTO } from './dto/product.dto';
 import { Product } from './models/product.entity';
 import { ProductService } from './product.service';
-import { ProductResultsVO, ProductResultVO, ProductVO } from './vo/product.vo';
+import {
+  ProductCategoryResultsVO,
+  ProductResultsVO,
+  ProductResultVO,
+  ProductVO,
+} from './vo/product.vo';
 
 @Resolver(() => ProductVO)
 @UseGuards(JwtGqlAuthGuard)
@@ -144,6 +150,15 @@ export class ProductResolver {
     return {
       code: PRODUCT_NOT_EXIST,
       message: '商品信息不存在',
+    };
+  }
+
+  @Query(() => ProductCategoryResultsVO)
+  async getProductCategories(): Promise<ProductCategoryResultsVO> {
+    return {
+      code: SUCCESS,
+      data: PRODUCT_CATEGORIES,
+      message: '获取成功',
     };
   }
 }

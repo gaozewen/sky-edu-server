@@ -12,9 +12,9 @@ import { CommonEntity } from '@/common/entities/common.entity';
 import { Card } from '@/modules/card/models/card.entity';
 import { Store } from '@/modules/store/models/store.entity';
 
-export enum ProductType {
-  TIME = 'time',
-  DURATION = 'duration',
+export enum ProductStatus {
+  LIST = 'list', // 上架
+  UN_LIST = 'un_list', // 下架
 }
 
 /**
@@ -33,6 +33,21 @@ export class Product extends CommonEntity {
     nullable: true,
   })
   desc: string;
+
+  @Column({
+    comment: '商品品类',
+    nullable: true,
+  })
+  category: string;
+
+  @Column({
+    comment: '上下架状态',
+    type: 'enum',
+    enum: ProductStatus,
+    default: ProductStatus.UN_LIST,
+  })
+  @IsNotEmpty()
+  status: ProductStatus;
 
   @Column({
     comment: '库存总数',
