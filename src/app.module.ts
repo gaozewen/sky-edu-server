@@ -16,6 +16,7 @@ import { SMSModule } from './modules/sms/sms.module';
 import { StoreModule } from './modules/store/store.module';
 import { StudentModule } from './modules/student/student.module';
 import { UserModule } from './modules/user/user.module';
+import { WxpayModule } from './modules/wxpay/wxpay.module';
 
 config();
 
@@ -50,6 +51,7 @@ config();
     CourseModule,
     CardModule,
     ProductModule,
+    WxpayModule,
   ],
   controllers: [AppController],
   providers: [AppService],

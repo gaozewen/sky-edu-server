@@ -28,6 +28,12 @@ export class StudentVO extends CommonVO {
     nullable: true,
   })
   nickname: string;
+
+  @Field({
+    description: '微信 openid',
+    nullable: true,
+  })
+  wxOpenid: string;
 }
 
 @ObjectType()

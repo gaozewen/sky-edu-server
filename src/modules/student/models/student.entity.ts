@@ -31,4 +31,12 @@ export class Student extends CommonEntity {
     default: '',
   })
   nickname: string;
+
+  @Column({
+    comment: '微信 openid',
+    name: 'wx_openid',
+    default: '',
+    nullable: true,
+  })
+  wxOpenid: string;
 }
