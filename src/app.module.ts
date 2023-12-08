@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { config } from 'dotenv';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -16,15 +17,17 @@ import { StoreModule } from './modules/store/store.module';
 import { StudentModule } from './modules/student/student.module';
 import { UserModule } from './modules/user/user.module';
 
+config();
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '000000',
-      database: 'sky_edu',
+      host: process.env.MYSQL_HOST,
+      port: Number(process.env.MYSQL_PORT),
+      username: process.env.MYSQL_USERNAME,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
       entities: [`${__dirname}/modules/**/*.entity{.ts,.js}`],
       logging: true,
       synchronize: true,

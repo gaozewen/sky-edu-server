@@ -181,6 +181,30 @@ export class ProductResolver {
     };
   }
 
+  @Query(() => ProductResultsVO)
+  async getProductsByStoreIdForH5(
+    @Args('storeId') storeId: string,
+  ): Promise<ProductResultsVO> {
+    const where: FindOptionsWhere<Product> = {
+      store: {
+        id: storeId,
+      },
+      status: ProductStatus.LIST,
+    };
+
+    const [results] = await this.productService.findProducts({
+      start: 0,
+      length: 5,
+      where,
+    });
+
+    return {
+      code: SUCCESS,
+      data: results,
+      message: '获取成功',
+    };
+  }
+
   @Mutation(() => ResultVO)
   async deleteProduct(
     @Args('id') id: string,
