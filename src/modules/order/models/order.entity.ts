@@ -1,10 +1,11 @@
 import { IsNotEmpty } from 'class-validator';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Product } from '@/modules/product/models/product.entity';
 import { Store } from '@/modules/store/models/store.entity';
 import { Student } from '@/modules/student/models/student.entity';
+import { WxOrder } from '@/modules/wx-order/models/wx-order.entity';
 
 export enum OrderStatus {
   SUCCESS = 'SUCCESS', // 支付成功
@@ -69,4 +70,11 @@ export class Order extends CommonEntity {
   })
   @JoinColumn({ name: 'student_id' })
   student: Student;
+
+  // 关联微信支付订单
+  @OneToOne(() => WxOrder, {
+    cascade: true,
+  })
+  @JoinColumn({ name: 'wx_order_id' })
+  wxOrder: WxOrder;
 }

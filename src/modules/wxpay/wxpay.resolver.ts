@@ -59,10 +59,29 @@ export class WxPayResolver {
         message: '微信 openid 不存在',
       };
     }
+    const outTradeNo = v4().replace(/-/g, '');
+    // 1.创建项目自己的预支付订单
+    await this.orderService.create({
+      outTradeNo,
+      tel: student.tel,
+      quantity,
+      amount,
+      status: OrderStatus.USERPAYING,
+      product: {
+        id: productId,
+      },
+      store: {
+        id: product.store.id,
+      },
+      student: {
+        id,
+      },
+    });
 
+    // 2.获取微信支付配置信息成功
     const params = {
       description: product.name,
-      out_trade_no: v4().replace(/-/g, ''),
+      out_trade_no: outTradeNo,
       notify_url: `${process.env.SKY_EDU_SERVER_URL}/wx/payResult`,
       amount: {
         total: amount,
@@ -91,22 +110,7 @@ export class WxPayResolver {
     } else {
       result = await this.wxPay.transactions_jsapi(params);
     }
-    // 创建项目自己的预支付订单
-    await this.orderService.create({
-      tel: student.tel,
-      quantity,
-      amount,
-      status: OrderStatus.USERPAYING,
-      product: {
-        id: productId,
-      },
-      store: {
-        id: product.store.id,
-      },
-      student: {
-        id,
-      },
-    });
+
     return {
       code: SUCCESS,
       data: result as WxPayConfigVO,

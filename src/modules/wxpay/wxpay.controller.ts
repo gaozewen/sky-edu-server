@@ -14,6 +14,8 @@ import WxPay from 'wechatpay-node-v3';
 import { OrderStatus } from '../order/models/order.entity';
 import { OrderService } from '../order/order.service';
 import { StudentService } from '../student/student.service';
+import { WxOrderVO } from '../wx-order/vo/wx-order.vo';
+import { WxOrderService } from '../wx-order/wx-order.service';
 import { IWxPayResultDTO } from './dto/wx.dto';
 /**
  * sky-edu-server.gaozewen.com/wx/xxx
@@ -25,6 +27,7 @@ export class WxpayController {
     @Inject(WECHAT_PAY_MANAGER) private wxPay: WxPay,
     private readonly studentService: StudentService,
     private readonly orderService: OrderService,
+    private readonly wxOrderService: WxOrderService,
   ) {}
 
   // /wx/login
@@ -71,10 +74,7 @@ export class WxpayController {
   async wxPayResult(@Body() data: IWxPayResultDTO) {
     const { resource } = data;
     const { ciphertext, associated_data, nonce } = resource;
-    const result: {
-      out_trade_no: string;
-      trade_state: string;
-    } = this.wxPay.decipher_gcm(
+    const result: WxOrderVO = this.wxPay.decipher_gcm(
       ciphertext,
       associated_data,
       nonce,
@@ -83,11 +83,24 @@ export class WxpayController {
     const order = await this.orderService.findByOutTradeNo(result.out_trade_no);
     // 目前只考虑支付中和支付成功两个状态
     if (order && order.status === OrderStatus.USERPAYING) {
-      // 更新项目自己的订单状态
-      await this.orderService.updateById(order.id, {
-        status: result.trade_state as OrderStatus,
-        // TODO: 关联微信支付订单
-      });
+      // 查询是否已经在数据库生成了微信支付订单
+      let wxOrder = await this.wxOrderService.findByTransactionId(
+        result.transaction_id,
+      );
+
+      if (!wxOrder) {
+        // 没有生成，则创建微信支付订单
+        wxOrder = await this.wxOrderService.create(result);
+      }
+
+      if (wxOrder) {
+        // 更新项目自己的订单状态
+        await this.orderService.updateById(order.id, {
+          status: result.trade_state as OrderStatus,
+          // 关联微信支付订单
+          wxOrder,
+        });
+      }
     }
 
     return {

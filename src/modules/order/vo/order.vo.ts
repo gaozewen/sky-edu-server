@@ -5,6 +5,7 @@ import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { ProductVO } from '@/modules/product/vo/product.vo';
 import { StoreVO } from '@/modules/store/vo/store.vo';
 import { StudentVO } from '@/modules/student/vo/student.vo';
+import { WxOrderVO } from '@/modules/wx-order/vo/wx-order.vo';
 
 import { OrderStatus } from '../models/order.entity';
 
@@ -49,6 +50,11 @@ export class OrderVO extends CommonVO {
     description: '购买学员',
   })
   student: StudentVO;
+
+  @Field(() => WxOrderVO, {
+    description: '对应的微信支付订单信息',
+  })
+  wxOrder: WxOrderVO;
 }
 
 @ObjectType()

@@ -2,25 +2,25 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FindOptionsWhere } from 'typeorm';
 
-import { DB_ERROR, ORDER_NOT_EXIST, SUCCESS } from '@/common/constants/code';
+import { DB_ERROR, SUCCESS, WX_ORDER_NOT_EXIST } from '@/common/constants/code';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
-import { Order } from './models/order.entity';
-import { OrderService } from './order.service';
-import { OrderResultsVO, OrderResultVO, OrderVO } from './vo/order.vo';
+import { WxOrder } from './models/wx-order.entity';
+import { WxOrderResultsVO, WxOrderResultVO, WxOrderVO } from './vo/wx-order.vo';
+import { WxOrderService } from './wx-order.service';
 
-@Resolver(() => OrderVO)
+@Resolver(() => WxOrderVO)
 @UseGuards(JwtGqlAuthGuard)
-export class OrderResolver {
-  constructor(private readonly orderService: OrderService) {}
+export class WxOrderResolver {
+  constructor(private readonly wxOrderService: WxOrderService) {}
 
-  @Query(() => OrderResultVO)
-  async getOrder(@Args('id') id: string): Promise<OrderResultVO> {
-    const result = await this.orderService.findById(id);
+  @Query(() => WxOrderResultVO)
+  async getWxOrder(@Args('id') id: string): Promise<WxOrderResultVO> {
+    const result = await this.wxOrderService.findById(id);
     if (result) {
       return {
         code: SUCCESS,
@@ -29,26 +29,25 @@ export class OrderResolver {
       };
     }
     return {
-      code: ORDER_NOT_EXIST,
-      message: '订单信息不存在',
+      code: WX_ORDER_NOT_EXIST,
+      message: '微信订单信息不存在',
     };
   }
 
-  @Query(() => OrderResultsVO)
-  async getOrders(
+  @Query(() => WxOrderResultsVO)
+  async getWxOrders(
     @Args('pageInfo') pageInfo: PageInfoDTO,
     @JwtUserId() userId: string,
     @CurStoreId() storeId: string,
-  ): Promise<OrderResultsVO> {
+  ): Promise<WxOrderResultsVO> {
     const { pageNum, pageSize } = pageInfo;
-    const where: FindOptionsWhere<Order> = {
+    const where: FindOptionsWhere<WxOrder> = {
       createdBy: userId,
       store: {
         id: storeId,
       },
     };
-
-    const [results, total] = await this.orderService.findOrders({
+    const [results, total] = await this.wxOrderService.findWxOrders({
       start: pageNum === 1 ? 0 : (pageNum - 1) * pageSize,
       length: pageSize,
       where,
@@ -66,13 +65,13 @@ export class OrderResolver {
   }
 
   @Mutation(() => ResultVO)
-  async deleteOrder(
+  async deleteWxOrder(
     @Args('id') id: string,
     @JwtUserId() userId: string,
   ): Promise<ResultVO> {
-    const result = await this.orderService.findById(id);
+    const result = await this.wxOrderService.findById(id);
     if (result) {
-      const delRes = await this.orderService.deleteById(id, userId);
+      const delRes = await this.wxOrderService.deleteById(id, userId);
       if (delRes) {
         return {
           code: SUCCESS,
@@ -85,8 +84,8 @@ export class OrderResolver {
       };
     }
     return {
-      code: ORDER_NOT_EXIST,
-      message: '订单信息不存在',
+      code: WX_ORDER_NOT_EXIST,
+      message: '微信订单信息不存在',
     };
   }
 }
