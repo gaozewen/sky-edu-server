@@ -27,5 +27,7 @@ export const COURSE_NOT_EXIST = 10011;
 export const CARD_NOT_EXIST = 10012;
 // 商品信息不存在
 export const PRODUCT_NOT_EXIST = 10013;
-//  微信 openid 不存在
+// 微信 openid 不存在
 export const WX_OPENID_NOT_EXIST = 10014;
+// 订单信息不存在
+export const ORDER_NOT_EXIST = 10015;

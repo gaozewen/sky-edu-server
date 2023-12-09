@@ -13,6 +13,8 @@ import {
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
+import { OrderStatus } from '../order/models/order.entity';
+import { OrderService } from '../order/order.service';
 import { ProductService } from '../product/product.service';
 import { StudentService } from '../student/student.service';
 import { WxPayConfigResultVO, WxPayConfigVO } from './vo/wxpay.vo';
@@ -24,6 +26,7 @@ export class WxPayResolver {
     @Inject(WECHAT_PAY_MANAGER) private wxPay: WxPay,
     private readonly studentService: StudentService,
     private readonly productService: ProductService,
+    private readonly orderService: OrderService,
   ) {}
 
   // appId: 'wx2421b1c4370ec43b', //公众号ID，由商户传入
@@ -37,6 +40,7 @@ export class WxPayResolver {
   async getWxPayConfig(
     @JwtUserId() id: string,
     @Args('productId') productId: string,
+    @Args('quantity', { type: () => Int }) quantity: number, // 购买的商品数量
     @Args('amount', { type: () => Int }) amount: number, // 以分为单位
   ): Promise<WxPayConfigResultVO> {
     const student = await this.studentService.findById(id);
@@ -59,7 +63,7 @@ export class WxPayResolver {
     const params = {
       description: product.name,
       out_trade_no: v4().replace(/-/g, ''),
-      notify_url: '回调url',
+      notify_url: `${process.env.SKY_EDU_SERVER_URL}/wx/payResult`,
       amount: {
         total: amount,
       },
@@ -87,6 +91,22 @@ export class WxPayResolver {
     } else {
       result = await this.wxPay.transactions_jsapi(params);
     }
+    // 创建项目自己的预支付订单
+    await this.orderService.create({
+      tel: student.tel,
+      quantity,
+      amount,
+      status: OrderStatus.USERPAYING,
+      product: {
+        id: productId,
+      },
+      store: {
+        id: product.store.id,
+      },
+      student: {
+        id,
+      },
+    });
     return {
       code: SUCCESS,
       data: result as WxPayConfigVO,

@@ -10,6 +10,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CardModule } from './modules/card/card.module';
 import { CourseModule } from './modules/course/course.module';
+import { OrderModule } from './modules/order/order.module';
 import { OSSModule } from './modules/oss/oss.module';
 import { ProductModule } from './modules/product/product.module';
 import { SMSModule } from './modules/sms/sms.module';
@@ -52,6 +53,7 @@ config();
     CardModule,
     ProductModule,
     WxpayModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
