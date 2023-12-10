@@ -34,6 +34,11 @@ class WeekOrderTimeDTO {
 @InputType()
 class CourseDTO {
   @Field({
+    description: '课程封面图',
+  })
+  coverUrl: string;
+
+  @Field({
     description: '课程名称',
   })
   name: string;

@@ -1,5 +1,13 @@
 import { IsInt, IsNotEmpty, Min } from 'class-validator';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  // JoinTable,
+  // ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Card } from '@/modules/card/models/card.entity';
@@ -9,6 +17,12 @@ import { WeekOrderTimeVO } from '../vo/course.vo';
 
 @Entity('course')
 export class Course extends CommonEntity {
+  @Column({
+    comment: '课程封面图',
+    name: 'cover_url',
+  })
+  coverUrl: string;
+
   @Column({
     comment: '课程名称',
   })
@@ -84,4 +98,14 @@ export class Course extends CommonEntity {
 
   @OneToMany(() => Card, (card) => card.course)
   cards: Card[];
+
+  // @ManyToMany(() => Teacher, {
+  //   cascade: true,
+  // })
+  // @JoinTable({
+  //   name: 'course_teacher',
+  //   joinColumns: [{ name: 'course_id' }],
+  //   inverseJoinColumns: [{ name: 'teacher_id' }],
+  // })
+  // teachers: Teacher[];
 }

@@ -37,6 +37,11 @@ export class WeekOrderTimeVO {
 @ObjectType()
 export class CourseVO extends CommonVO {
   @Field({
+    description: '课程封面图',
+  })
+  coverUrl: string;
+
+  @Field({
     description: '课程名称',
   })
   name: string;
