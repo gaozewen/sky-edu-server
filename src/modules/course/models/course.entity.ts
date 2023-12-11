@@ -3,6 +3,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   // JoinTable,
   // ManyToMany,
   ManyToOne,
@@ -12,6 +14,7 @@ import {
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Card } from '@/modules/card/models/card.entity';
 import { Store } from '@/modules/store/models/store.entity';
+import { Teacher } from '@/modules/teacher/models/teacher.entity';
 
 import { WeekOrderTimeVO } from '../vo/course.vo';
 
@@ -99,13 +102,13 @@ export class Course extends CommonEntity {
   @OneToMany(() => Card, (card) => card.course)
   cards: Card[];
 
-  // @ManyToMany(() => Teacher, {
-  //   cascade: true,
-  // })
-  // @JoinTable({
-  //   name: 'course_teacher',
-  //   joinColumns: [{ name: 'course_id' }],
-  //   inverseJoinColumns: [{ name: 'teacher_id' }],
-  // })
-  // teachers: Teacher[];
+  @ManyToMany(() => Teacher, {
+    cascade: true,
+  })
+  @JoinTable({
+    name: 'course_teacher',
+    joinColumns: [{ name: 'course_id' }],
+    inverseJoinColumns: [{ name: 'teacher_id' }],
+  })
+  teachers: Teacher[];
 }

@@ -92,6 +92,12 @@ class CourseDTO {
     nullable: true,
   })
   weeklyOrderTimes: WeekOrderTimeDTO[];
+
+  @Field(() => [String], {
+    description: '任课老师',
+    nullable: true,
+  })
+  teacherIds: string[];
 }
 
 @InputType()

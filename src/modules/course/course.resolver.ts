@@ -42,6 +42,11 @@ export class CourseResolver {
     @CurStoreId() storeId: string,
     @Args('id', { nullable: true }) id: string,
   ): Promise<ResultVO> {
+    const { teacherIds } = params;
+    const teachers =
+      teacherIds && teacherIds.length > 0
+        ? teacherIds.map((i) => ({ id: i }))
+        : [];
     if (!id) {
       const res = await this.courseService.create({
         ...params,
@@ -49,6 +54,7 @@ export class CourseResolver {
         store: {
           id: storeId,
         },
+        teachers,
       });
       if (res) {
         return {
@@ -66,6 +72,7 @@ export class CourseResolver {
       const res = await this.courseService.updateById(course.id, {
         ...params,
         updatedBy: userId,
+        teachers,
       });
       if (res) {
         return {

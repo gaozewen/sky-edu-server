@@ -2,6 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
+import { TeacherVO } from '@/modules/teacher/vo/teacher.vo';
 
 @ObjectType()
 class OrderTimeVO {
@@ -95,6 +96,12 @@ export class CourseVO extends CommonVO {
     nullable: true,
   })
   weeklyOrderTimes: WeekOrderTimeVO[];
+
+  @Field(() => [TeacherVO], {
+    description: '任课老师',
+    nullable: true,
+  })
+  teachers: TeacherVO[];
 }
 
 @ObjectType()
