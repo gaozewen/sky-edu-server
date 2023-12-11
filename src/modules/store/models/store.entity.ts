@@ -5,7 +5,7 @@ import { CommonEntity } from '@/common/entities/common.entity';
 import { Card } from '@/modules/card/models/card.entity';
 import { Course } from '@/modules/course/models/course.entity';
 import { Product } from '@/modules/product/models/product.entity';
-import { StoreImage } from '@/modules/storeImage/models/storeImage.entity';
+import { StoreImage } from '@/modules/store-image/models/storeImage.entity';
 import { Teacher } from '@/modules/teacher/models/teacher.entity';
 
 @Entity('store')

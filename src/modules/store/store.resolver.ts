@@ -8,7 +8,7 @@ import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
-import { StoreImageService } from '../storeImage/storeImage.service';
+import { StoreImageService } from '../store-image/storeImage.service';
 import { StoreDTO } from './dto/store.dto';
 import { Store } from './models/store.entity';
 import { StoreService } from './store.service';

@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-import { StoreImageDTO } from '@/modules/storeImage/dto/storeImage.dto';
+import { StoreImageDTO } from '@/modules/store-image/dto/storeImage.dto';
 
 @InputType()
 export class StoreDTO {
