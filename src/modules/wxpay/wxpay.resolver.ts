@@ -14,6 +14,7 @@ import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
+import { CardRecordService } from '../card-record/card-record.service';
 import { OrderStatus } from '../order/models/order.entity';
 import { OrderService } from '../order/order.service';
 import { ProductService } from '../product/product.service';
@@ -29,6 +30,7 @@ export class WxPayResolver {
     private readonly studentService: StudentService,
     private readonly productService: ProductService,
     private readonly orderService: OrderService,
+    private readonly cardRecordService: CardRecordService,
   ) {}
 
   // appId: 'wx2421b1c4370ec43b', //公众号ID，由商户传入
@@ -167,6 +169,9 @@ export class WxPayResolver {
         },
       },
     });
+
+    // 2.为当前购买用户生成商品对应的消费卡记录
+    await this.cardRecordService.addCardRecordsForStudent(id, product.cards);
 
     return {
       code: SUCCESS,

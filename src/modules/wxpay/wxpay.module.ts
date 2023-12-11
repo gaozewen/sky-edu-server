@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import * as fs from 'fs';
 import { WeChatPayModule } from 'nest-wechatpay-node-v3';
 
+import { CardRecordModule } from '../card-record/card-record.module';
 import { OrderModule } from '../order/order.module';
 import { ProductModule } from '../product/product.module';
 import { StudentModule } from '../student/student.module';
@@ -31,6 +32,8 @@ config();
     ProductModule,
     OrderModule,
     WxOrderModule,
+    CardRecordModule,
+    ProductModule,
   ],
   controllers: [WxpayController],
   providers: [WxPayResolver],

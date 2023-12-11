@@ -11,8 +11,10 @@ import axios from 'axios';
 import { WECHAT_PAY_MANAGER } from 'nest-wechatpay-node-v3';
 import WxPay from 'wechatpay-node-v3';
 
+import { CardRecordService } from '../card-record/card-record.service';
 import { OrderStatus } from '../order/models/order.entity';
 import { OrderService } from '../order/order.service';
+import { ProductService } from '../product/product.service';
 import { StudentService } from '../student/student.service';
 import { WxOrderVO } from '../wx-order/vo/wx-order.vo';
 import { WxOrderService } from '../wx-order/wx-order.service';
@@ -28,6 +30,8 @@ export class WxpayController {
     private readonly studentService: StudentService,
     private readonly orderService: OrderService,
     private readonly wxOrderService: WxOrderService,
+    private readonly cardRecordService: CardRecordService,
+    private readonly productService: ProductService,
   ) {}
 
   // /wx/login
@@ -100,6 +104,15 @@ export class WxpayController {
           // 关联微信支付订单
           wxOrder,
         });
+        // 为当前购买用户生成商品对应的消费卡记录
+        const product = await this.productService.findById(order.product.id);
+        const isSuccess = await this.cardRecordService.addCardRecordsForStudent(
+          order.student.id,
+          product.cards,
+        );
+        if (!isSuccess) {
+          // TODO: 记录错误日志，发邮件给管理员，手动处理
+        }
       }
     }
 

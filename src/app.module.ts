@@ -9,6 +9,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CardModule } from './modules/card/card.module';
+import { CardRecordModule } from './modules/card-record/card-record.module';
 import { CourseModule } from './modules/course/course.module';
 import { OrderModule } from './modules/order/order.module';
 import { OSSModule } from './modules/oss/oss.module';
@@ -58,6 +59,7 @@ config();
     OrderModule,
     WxOrderModule,
     TeacherModule,
+    CardRecordModule,
   ],
   controllers: [AppController],
   providers: [AppService],
