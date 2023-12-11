@@ -64,7 +64,7 @@ export class Order extends CommonEntity {
   student: Student;
 
   // 关联微信支付订单
-  @OneToOne(() => WxOrder, {
+  @OneToOne(() => WxOrder, (wxOrder) => wxOrder.order, {
     cascade: true,
   })
   @JoinColumn({ name: 'wx_order_id' })

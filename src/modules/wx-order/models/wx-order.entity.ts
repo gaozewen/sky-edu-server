@@ -1,8 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 import { OrderStatus, TradeType } from '@/common/constants/enum';
 import { CommonEntity } from '@/common/entities/common.entity';
+import { Order } from '@/modules/order/models/order.entity';
 import { Store } from '@/modules/store/models/store.entity';
 
 /**
@@ -104,4 +105,8 @@ export class WxOrder extends CommonEntity {
   })
   @JoinColumn({ name: 'store_id' })
   store: Store;
+
+  // 关联项目自己的订单
+  @OneToOne(() => Order, (order) => order.wxOrder)
+  order: Order;
 }
