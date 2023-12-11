@@ -5,7 +5,7 @@ import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { TeacherVO } from '@/modules/teacher/vo/teacher.vo';
 
 @ObjectType()
-class OrderTimeVO {
+export class OrderTimeVO {
   @Field({
     description: 'ID',
   })

@@ -35,3 +35,5 @@ export const ORDER_NOT_EXIST = 10015;
 export const WX_ORDER_NOT_EXIST = 10016;
 // 教师信息不存在
 export const TEACHER_NOT_EXIST = 10017;
+// 课程表信息不存在
+export const SCHEDULE_NOT_EXIST = 10018;

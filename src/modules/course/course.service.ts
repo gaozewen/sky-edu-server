@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import _ from 'lodash';
+import {
+  DeepPartial,
+  FindManyOptions,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 
 import { Course } from './models/course.entity';
 
@@ -47,19 +53,28 @@ export class CourseService {
     start,
     length,
     where,
+    noPage, // 不分页
   }: {
-    start: number;
-    length: number;
+    start?: number;
+    length?: number;
     where: FindOptionsWhere<Course>;
+    noPage?: boolean;
   }): Promise<[Course[], number]> {
-    return this.courseRepository.findAndCount({
+    let options: FindManyOptions<Course> = {
       take: length,
       skip: start,
       where,
       order: {
         createdAt: 'DESC',
       },
-    });
+      relations: ['store'],
+    };
+
+    if (noPage) {
+      options = _.omit(options, 'take', 'skip');
+    }
+
+    return this.courseRepository.findAndCount(options);
   }
 
   async deleteById(id: string, userId: string): Promise<boolean> {
