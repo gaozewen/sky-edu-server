@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import * as dayjs from 'dayjs';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import { Between, FindOptionsWhere } from 'typeorm';
 
 import { DB_ERROR, SCHEDULE_NOT_EXIST, SUCCESS } from '@/common/constants/code';
@@ -63,6 +63,7 @@ export class ScheduleResolver {
       },
       noPage: true,
     });
+
     // 1.获取当前门店下的所有课程
     const [courses] = await this.courseService.findCourses({
       where: {
@@ -98,16 +99,19 @@ export class ScheduleResolver {
             schedule.course = course;
             schedule.schoolDay = curDay.toDate();
             schedule.createdBy = userId;
+
             // 是否已经排好（数据库已存在）
             const isScheduled = _.some(
               createdSchedules,
               (item: Schedule) =>
                 item.startTime === schedule.startTime &&
                 item.endTime === schedule.endTime &&
-                item.schoolDay === schedule.schoolDay &&
+                dayjs(item.schoolDay).toString() ===
+                  dayjs(schedule.schoolDay).toString() &&
                 item.store.id === schedule.store.id &&
                 item.course.id === schedule.course.id,
             );
+
             if (!isScheduled) {
               schedules.push(this.scheduleService.createEntity(schedule));
             }
@@ -132,7 +136,7 @@ export class ScheduleResolver {
     if (res) {
       return {
         code: SUCCESS,
-        message: '创建成功',
+        message: `创建成功，共 ${res.length} 条记录`,
       };
     }
     return {

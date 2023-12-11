@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import {
   DeepPartial,
   FindManyOptions,

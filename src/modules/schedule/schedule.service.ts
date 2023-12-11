@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import _ from 'lodash';
+import * as _ from 'lodash';
 import {
   DeepPartial,
   FindManyOptions,
@@ -31,12 +31,9 @@ export class ScheduleService {
     return this.scheduleRepository.create(entity);
   }
 
-  async batchCreate(entities: Schedule[]): Promise<boolean> {
+  async batchCreate(entities: Schedule[]): Promise<Schedule[]> {
     const res = await this.scheduleRepository.save(entities);
-    if (res) {
-      return true;
-    }
-    return false;
+    return res;
   }
 
   async findById(id: string): Promise<Schedule> {
