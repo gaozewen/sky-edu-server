@@ -2,7 +2,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
-import { StoreImageVO } from '@/modules/store-image/vo/storeImage.vo';
+import { StoreImageVO } from '@/modules/store-image/vo/store-image.vo';
 
 @ObjectType()
 export class StoreVO extends CommonVO {
