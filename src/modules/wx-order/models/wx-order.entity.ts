@@ -1,18 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
+import { OrderStatus, TradeType } from '@/common/constants/enum';
 import { CommonEntity } from '@/common/entities/common.entity';
-import { OrderStatus } from '@/modules/order/models/order.entity';
 import { Store } from '@/modules/store/models/store.entity';
-
-export enum TradeType {
-  JSAPI = 'JSAPI', // 公众号支付
-  NATIVE = 'NATIVE', // 扫码支付
-  App = 'App', // App支付
-  MICROPAY = 'MICROPAY', // 付款码支付
-  MWEB = 'MWEB', // H5支付
-  FACEPAY = 'FACEPAY', // 刷脸支付
-}
 
 /**
  * 微信支付订单信息

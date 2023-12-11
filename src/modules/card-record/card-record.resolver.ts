@@ -1,9 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import * as dayjs from 'dayjs';
 import { FindOptionsWhere } from 'typeorm';
 
 import { CARD_NOT_EXIST, DB_ERROR, SUCCESS } from '@/common/constants/code';
-import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
+import { CardRecordStatus, CardType } from '@/common/constants/enum';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
@@ -39,20 +40,14 @@ export class CardRecordResolver {
   }
 
   @Query(() => CardRecordResultsVO)
-  async getCardRecords(
+  async getCardRecordsForH5(
     @Args('pageInfo') pageInfo: PageInfoDTO,
-    @Args('courseId') courseId: string,
     @JwtUserId() userId: string,
-    @CurStoreId() storeId: string,
   ): Promise<CardRecordResultsVO> {
     const { pageNum, pageSize } = pageInfo;
     const where: FindOptionsWhere<CardRecord> = {
-      createdBy: userId,
-      course: {
-        id: courseId,
-      },
-      store: {
-        id: storeId,
+      student: {
+        id: userId,
       },
     };
     const [results, total] = await this.cardRecordService.findCardRecords({
@@ -60,9 +55,24 @@ export class CardRecordResolver {
       length: pageSize,
       where,
     });
+
+    const data = results.map((cr) => {
+      let status = CardRecordStatus.VALID;
+      if (cr.card.type === CardType.TIME && cr.remainTime === 0) {
+        // 耗尽了
+        status = CardRecordStatus.DEPLETED;
+      } else if (dayjs().isAfter(cr.endTime)) {
+        // 过期了
+        status = CardRecordStatus.EXPIRED;
+      }
+      return {
+        ...cr,
+        status,
+      };
+    });
     return {
       code: SUCCESS,
-      data: results,
+      data,
       pageInfo: {
         pageNum,
         pageSize,

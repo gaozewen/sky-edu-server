@@ -11,8 +11,9 @@ import axios from 'axios';
 import { WECHAT_PAY_MANAGER } from 'nest-wechatpay-node-v3';
 import WxPay from 'wechatpay-node-v3';
 
+import { OrderStatus } from '@/common/constants/enum';
+
 import { CardRecordService } from '../card-record/card-record.service';
-import { OrderStatus } from '../order/models/order.entity';
 import { OrderService } from '../order/order.service';
 import { ProductService } from '../product/product.service';
 import { StudentService } from '../student/student.service';

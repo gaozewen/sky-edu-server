@@ -1,9 +1,8 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import { CardType } from '@/common/constants/enum';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { CourseVO } from '@/modules/course/vo/course.vo';
-
-import { CardType } from '../models/card.entity';
 
 @ObjectType()
 export class CardVO {

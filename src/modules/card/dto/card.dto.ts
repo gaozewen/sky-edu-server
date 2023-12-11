@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-import { CardType } from '../models/card.entity';
+import { CardType } from '@/common/constants/enum';
 
 @InputType()
 export class CardDTO {

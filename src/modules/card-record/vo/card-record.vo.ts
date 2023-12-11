@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import { CardRecordStatus } from '@/common/constants/enum';
 import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { CardVO } from '@/modules/card/vo/card.vo';
@@ -29,9 +30,14 @@ export class CardRecordVO extends CommonVO {
 
   @Field({
     description: '剩余次数',
-    name: 'remain_time',
   })
   remainTime: number;
+
+  @Field({
+    description: '消费卡记录状态',
+    nullable: true,
+  })
+  status?: CardRecordStatus;
 
   // 关联消费卡
   @Field(() => CardVO, {

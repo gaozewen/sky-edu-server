@@ -1,14 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
+import { CardType } from '@/common/constants/enum';
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Course } from '@/modules/course/models/course.entity';
 import { Store } from '@/modules/store/models/store.entity';
-
-export enum CardType {
-  TIME = 'time',
-  DURATION = 'duration',
-}
 
 /**
  * 消费卡

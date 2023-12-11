@@ -1,6 +1,6 @@
 import { Field, InputType, PartialType } from '@nestjs/graphql';
 
-import { ProductStatus } from '../models/product.entity';
+import { ProductStatus } from '@/common/constants/enum';
 
 @InputType()
 export class ProductDTO {

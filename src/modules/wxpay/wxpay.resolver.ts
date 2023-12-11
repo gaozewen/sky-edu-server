@@ -10,16 +10,15 @@ import {
   SUCCESS,
   WX_OPENID_NOT_EXIST,
 } from '@/common/constants/code';
+import { OrderStatus, TradeType } from '@/common/constants/enum';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
 import { CardRecordService } from '../card-record/card-record.service';
-import { OrderStatus } from '../order/models/order.entity';
 import { OrderService } from '../order/order.service';
 import { ProductService } from '../product/product.service';
 import { StudentService } from '../student/student.service';
-import { TradeType } from '../wx-order/models/wx-order.entity';
 import { WxPayConfigResultVO, WxPayConfigVO } from './vo/wxpay.vo';
 
 @Resolver()

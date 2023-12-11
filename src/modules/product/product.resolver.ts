@@ -3,6 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FindOptionsWhere, Like } from 'typeorm';
 
 import { DB_ERROR, PRODUCT_NOT_EXIST, SUCCESS } from '@/common/constants/code';
+import { ProductStatus } from '@/common/constants/enum';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
@@ -11,7 +12,7 @@ import { ResultVO } from '@/common/vo/result.vo';
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
 import { PRODUCT_CATEGORIES } from './constants/product.category';
 import { PartialProductDTO } from './dto/product.dto';
-import { Product, ProductStatus } from './models/product.entity';
+import { Product } from './models/product.entity';
 import { ProductService } from './product.service';
 import {
   ProductCategoryResultsVO,

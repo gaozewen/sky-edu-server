@@ -1,11 +1,9 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import { OrderStatus, TradeType } from '@/common/constants/enum';
 import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
-import { OrderStatus } from '@/modules/order/models/order.entity';
 import { StoreVO } from '@/modules/store/vo/store.vo';
-
-import { TradeType } from '../models/wx-order.entity';
 
 @ObjectType()
 export class WxOrderVO extends CommonVO {

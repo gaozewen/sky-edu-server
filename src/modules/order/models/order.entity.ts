@@ -1,21 +1,13 @@
 import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
+import { OrderStatus } from '@/common/constants/enum';
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Product } from '@/modules/product/models/product.entity';
 import { Store } from '@/modules/store/models/store.entity';
 import { Student } from '@/modules/student/models/student.entity';
 import { WxOrder } from '@/modules/wx-order/models/wx-order.entity';
 
-export enum OrderStatus {
-  SUCCESS = 'SUCCESS', // 支付成功
-  REFUND = 'REFUND', // 转入退款
-  NOTPAY = 'NOTPAY', // 未支付
-  CLOSED = 'CLOSED', // 已关闭
-  REVOKED = 'REVOKED', // 已撤销（付款码支付）
-  USERPAYING = 'USERPAYING', // 用户支付中（付款码支付）
-  PAYERROR = 'PAYERROR', // 支付失败(其他原因，如银行返回失败)
-}
 /**
  * 商品订单
  */

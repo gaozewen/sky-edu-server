@@ -4,9 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs';
 import { FindOptionsWhere, Repository } from 'typeorm';
 
+import { Platform, TempType } from '@/common/constants/enum';
+
 import { sendAliyunSMS } from './aliyun';
 import { SMS } from './models/sms.entity';
-import { Platform, SMSInput, TempType } from './sms.utils';
+import { SMSInput } from './sms.utils';
 import { sendTencentSMS } from './tencent';
 
 @Injectable()

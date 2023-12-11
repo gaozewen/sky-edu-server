@@ -8,14 +8,10 @@ import {
   ManyToOne,
 } from 'typeorm';
 
+import { ProductStatus } from '@/common/constants/enum';
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Card } from '@/modules/card/models/card.entity';
 import { Store } from '@/modules/store/models/store.entity';
-
-export enum ProductStatus {
-  LIST = 'list', // 上架
-  UN_LIST = 'un_list', // 下架
-}
 
 /**
  * 商品

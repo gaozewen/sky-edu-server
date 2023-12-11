@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 
-import { Product, ProductStatus } from './models/product.entity';
+import { ProductStatus } from '@/common/constants/enum';
+
+import { Product } from './models/product.entity';
 
 @Injectable()
 export class ProductService {
@@ -26,7 +28,7 @@ export class ProductService {
       where: {
         id,
       },
-      relations: ['store', 'cards', 'cards.course'],
+      relations: ['store', 'cards', 'cards.course', 'cards.store'],
     });
   }
 

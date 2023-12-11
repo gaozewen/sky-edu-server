@@ -1,13 +1,5 @@
-export enum Platform {
-  Aliyun = 'Aliyun',
-  Tencent = 'Tencent',
-}
-export enum TempType {
-  // 授权码
-  AUTH = 'AUTH',
-  // 修改密码
-  FORGET_PWD = 'FORGET_PWD',
-}
+import { Platform, TempType } from '@/common/constants/enum';
+
 type TempParamsObj = {
   [Platform.Aliyun]: { [key: string]: any };
   [Platform.Tencent]: string[];

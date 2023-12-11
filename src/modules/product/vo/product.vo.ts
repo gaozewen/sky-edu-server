@@ -1,11 +1,10 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 
+import { ProductStatus } from '@/common/constants/enum';
 import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { CardVO } from '@/modules/card/vo/card.vo';
 import { StoreVO } from '@/modules/store/vo/store.vo';
-
-import { ProductStatus } from '../models/product.entity';
 
 @ObjectType()
 export class ProductVO extends CommonVO {
