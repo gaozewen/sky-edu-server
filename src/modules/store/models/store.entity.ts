@@ -6,6 +6,7 @@ import { Card } from '@/modules/card/models/card.entity';
 import { Course } from '@/modules/course/models/course.entity';
 import { Product } from '@/modules/product/models/product.entity';
 import { StoreImage } from '@/modules/storeImage/models/storeImage.entity';
+import { Teacher } from '@/modules/teacher/models/teacher.entity';
 
 @Entity('store')
 export class Store extends CommonEntity {
@@ -115,4 +116,7 @@ export class Store extends CommonEntity {
 
   @OneToMany(() => Product, (product) => product.store)
   products: Product[];
+
+  @OneToMany(() => Teacher, (teacher) => teacher.store)
+  teachers: Teacher[];
 }

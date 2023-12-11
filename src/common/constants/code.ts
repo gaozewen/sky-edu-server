@@ -33,3 +33,5 @@ export const WX_OPENID_NOT_EXIST = 10014;
 export const ORDER_NOT_EXIST = 10015;
 //  微信订单信息不存在
 export const WX_ORDER_NOT_EXIST = 10016;
+// 教师信息不存在
+export const TEACHER_NOT_EXIST = 10017;
