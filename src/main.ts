@@ -10,10 +10,9 @@ async function bootstrap() {
       'http://localhost:5174',
       'http://192.168.2.23:5174',
       'http://192.168.1.100:5174',
-      'https://sky-edu-api.gaozewen.com/graphql',
+      'https://sky-edu-api.gaozewen.com',
     ],
-    // 仅支持 graphql 的 post 请求
-    methods: ['POST'],
+    methods: ['POST', 'GET'],
   });
   await app.listen(3000);
 }

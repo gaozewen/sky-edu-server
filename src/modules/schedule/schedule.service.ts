@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import {
   DeepPartial,
   FindManyOptions,
+  FindOptionsOrder,
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
@@ -66,20 +67,22 @@ export class ScheduleService {
     length,
     where,
     noPage, // 不分页
+    order,
   }: {
     start?: number;
     length?: number;
     where: FindOptionsWhere<Schedule>;
     noPage?: boolean;
+    order?: FindOptionsOrder<Schedule>;
   }): Promise<[Schedule[], number]> {
     let options: FindManyOptions<Schedule> = {
       take: length,
       skip: start,
       where,
-      order: {
+      order: order || {
         createdAt: 'DESC',
       },
-      relations: ['store', 'course'],
+      relations: ['store', 'course', 'course.teachers'],
     };
     if (noPage) {
       options = _.omit(options, 'take', 'skip');

@@ -136,12 +136,38 @@ export class ScheduleResolver {
     if (res) {
       return {
         code: SUCCESS,
-        message: `创建成功，共 ${res.length} 条记录`,
+        message: `排课成功，共新增 ${res.length} 条排课记录`,
       };
     }
     return {
       code: DB_ERROR,
-      message: '创建失败',
+      message: '排课失败',
+    };
+  }
+
+  @Query(() => ScheduleResultsVO)
+  async getTodaySchedules(
+    @Args('today') today: string,
+    @CurStoreId() storeId: string,
+  ): Promise<ScheduleResultsVO> {
+    const where: FindOptionsWhere<Schedule> = {
+      schoolDay: dayjs(today).toDate(),
+      store: {
+        id: storeId,
+      },
+    };
+
+    const [results] = await this.scheduleService.findSchedules({
+      noPage: true,
+      where,
+      order: {
+        startTime: 'ASC',
+      },
+    });
+    return {
+      code: SUCCESS,
+      data: results,
+      message: '获取成功',
     };
   }
 
