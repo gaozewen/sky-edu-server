@@ -1,5 +1,6 @@
-import { Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
+import { ScheduleRecordStatus } from '@/common/constants/enum';
 import { CommonEntity } from '@/common/entities/common.entity';
 import { CardRecord } from '@/modules/card-record/models/card-record.entity';
 import { Course } from '@/modules/course/models/course.entity';
@@ -12,6 +13,14 @@ import { Student } from '@/modules/student/models/student.entity';
  */
 @Entity('schedule_record')
 export class ScheduleRecord extends CommonEntity {
+  @Column({
+    comment: '课程表记录状态',
+    type: 'enum',
+    enum: ScheduleRecordStatus,
+    nullable: true,
+  })
+  status: ScheduleRecordStatus;
+
   // 关联学生
   @ManyToOne(() => Student, { cascade: true })
   @JoinColumn({ name: 'student_id' })

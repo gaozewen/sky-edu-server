@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { CardRecordModule } from '../card-record/card-record.module';
 import { ScheduleRecord } from './models/schedule-record.entity';
 import { ScheduleRecordResolver } from './schedule-record.resolver';
 import { ScheduleRecordService } from './schedule-record.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ScheduleRecord])],
+  imports: [TypeOrmModule.forFeature([ScheduleRecord]), CardRecordModule],
   providers: [ScheduleRecordService, ScheduleRecordResolver],
   exports: [ScheduleRecordService],
 })

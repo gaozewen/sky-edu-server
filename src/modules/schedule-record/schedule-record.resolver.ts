@@ -1,18 +1,22 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import * as dayjs from 'dayjs';
 import { FindOptionsWhere } from 'typeorm';
 
+import { H_M_S_FORMAT } from '@/common/constants';
 import {
+  CANCEL_ORDER_COURSE_FAIL,
   DB_ERROR,
   SCHEDULE_RECORD_NOT_EXIST,
   SUCCESS,
 } from '@/common/constants/code';
-import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
+import { CardType, ScheduleRecordStatus } from '@/common/constants/enum';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
+import { CardRecordService } from '../card-record/card-record.service';
 import { ScheduleRecord } from './models/schedule-record.entity';
 import { ScheduleRecordService } from './schedule-record.service';
 import {
@@ -24,7 +28,10 @@ import {
 @Resolver(() => ScheduleRecordVO)
 @UseGuards(JwtGqlAuthGuard)
 export class ScheduleRecordResolver {
-  constructor(private readonly scheduleRecordService: ScheduleRecordService) {}
+  constructor(
+    private readonly scheduleRecordService: ScheduleRecordService,
+    private readonly cardRecordService: CardRecordService,
+  ) {}
 
   @Query(() => ScheduleRecordResultVO)
   async getScheduleRecord(
@@ -47,18 +54,12 @@ export class ScheduleRecordResolver {
   @Query(() => ScheduleRecordResultsVO)
   async getScheduleRecords(
     @Args('pageInfo') pageInfo: PageInfoDTO,
-    @Args('courseId') courseId: string,
     @JwtUserId() userId: string,
-    @CurStoreId() storeId: string,
   ): Promise<ScheduleRecordResultsVO> {
     const { pageNum, pageSize } = pageInfo;
     const where: FindOptionsWhere<ScheduleRecord> = {
-      createdBy: userId,
-      course: {
-        id: courseId,
-      },
-      store: {
-        id: storeId,
+      student: {
+        id: userId,
       },
     };
 
@@ -68,9 +69,43 @@ export class ScheduleRecordResolver {
         length: pageSize,
         where,
       });
+
+    const genStatus = (scheduleRecord: ScheduleRecord) => {
+      let status = ScheduleRecordStatus.PENDING;
+      const { schedule } = scheduleRecord;
+
+      // 如果已经有了，直接返回
+      if (scheduleRecord.status) return scheduleRecord.status;
+
+      const { schoolDay, startTime, endTime } = schedule;
+      const curDay = dayjs();
+      // 和今天是同一天
+      if (curDay.isSame(schoolDay, 'day')) {
+        if (
+          curDay.isAfter(dayjs(startTime, H_M_S_FORMAT)) &&
+          curDay.isBefore(dayjs(endTime, H_M_S_FORMAT))
+        ) {
+          // 正在上课
+          status = ScheduleRecordStatus.DOING;
+        } else if (curDay.isAfter(dayjs(endTime, H_M_S_FORMAT))) {
+          // 上完课了
+          status = ScheduleRecordStatus.DONE;
+        }
+      } else if (curDay.isAfter(schoolDay, 'day')) {
+        // 今天在上课日期之后
+        // 上完课了
+        status = ScheduleRecordStatus.DONE;
+      }
+      return status;
+    };
+
+    const data = results.map((r) => ({
+      ...r,
+      status: genStatus(r),
+    }));
     return {
       code: SUCCESS,
-      data: results,
+      data,
       pageInfo: {
         pageNum,
         pageSize,
@@ -102,6 +137,88 @@ export class ScheduleRecordResolver {
     return {
       code: SCHEDULE_RECORD_NOT_EXIST,
       message: '课程表记录信息不存在',
+    };
+  }
+  @Mutation(() => ResultVO, { description: '取消预约的课程表记录' })
+  async cancelOrderCourse(
+    @Args('scheduleRecordId') scheduleRecordId: string,
+    @JwtUserId() userId: string,
+  ): Promise<ResultVO> {
+    const scheduleRecord =
+      await this.scheduleRecordService.findById(scheduleRecordId);
+    if (!scheduleRecord) {
+      return {
+        code: SCHEDULE_RECORD_NOT_EXIST,
+        message: '没有预约记录，不能取消',
+      };
+    }
+
+    // 已经取消了
+    if (scheduleRecord.status === ScheduleRecordStatus.CANCEL) {
+      return {
+        code: CANCEL_ORDER_COURSE_FAIL,
+        message: '取消失败，无需重复取消预约',
+      };
+    }
+
+    const { schedule, cardRecord } = scheduleRecord;
+    const schoolDayStr = dayjs(schedule.schoolDay).format('YYYYMMDD');
+    const startTime = dayjs(
+      `${schoolDayStr} ${schedule.startTime}`,
+      'YYYYMMDD HH:mm:ss',
+    );
+    // 课程已开始，不能取消
+    const curTime = dayjs();
+    if (
+      curTime.isAfter(startTime.subtract(15, 'm')) &&
+      curTime.isBefore(startTime)
+    ) {
+      return {
+        code: CANCEL_ORDER_COURSE_FAIL,
+        message: '课程快开始了，不能取消了',
+      };
+    }
+
+    if (curTime.isAfter(startTime)) {
+      return {
+        code: CANCEL_ORDER_COURSE_FAIL,
+        message: '课程已开始，不能取消了',
+      };
+    }
+
+    // 取消预约
+    let isSuccess = await this.scheduleRecordService.updateById(
+      scheduleRecordId,
+      {
+        status: ScheduleRecordStatus.CANCEL,
+        updatedBy: userId,
+      },
+    );
+    if (!isSuccess) {
+      return {
+        code: CANCEL_ORDER_COURSE_FAIL,
+        message: '取消失败，状态更新失败',
+      };
+    }
+
+    // 归还消费卡次数
+    const { card } = cardRecord;
+    if (card.type === CardType.TIME) {
+      isSuccess = await this.cardRecordService.updateById(cardRecord.id, {
+        remainTime: cardRecord.remainTime + 1,
+        updatedBy: userId,
+      });
+      if (!isSuccess) {
+        return {
+          code: CANCEL_ORDER_COURSE_FAIL,
+          message: '归还消费卡次数失败',
+        };
+      }
+    }
+
+    return {
+      code: SUCCESS,
+      message: '取消成功',
     };
   }
 }

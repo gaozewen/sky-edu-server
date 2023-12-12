@@ -10,6 +10,12 @@ import { StudentVO } from '@/modules/student/vo/student.vo';
 
 @ObjectType()
 export class ScheduleRecordVO extends CommonVO {
+  @Field({
+    description: '课程表记录状态',
+    nullable: true,
+  })
+  status?: string;
+
   // 关联学生
   @Field(() => StudentVO, { description: '学生' })
   student: StudentVO;

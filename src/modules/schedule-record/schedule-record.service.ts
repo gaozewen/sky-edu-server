@@ -23,7 +23,7 @@ export class ScheduleRecordService {
       where: {
         id,
       },
-      relations: ['course'],
+      relations: ['schedule', 'cardRecord', 'cardRecord.card'],
     });
   }
 
@@ -75,6 +75,14 @@ export class ScheduleRecordService {
       order: {
         createdAt: 'DESC',
       },
+      relations: [
+        'student',
+        'cardRecord',
+        'schedule',
+        'schedule.teacher',
+        'course',
+        'store',
+      ],
     });
   }
 

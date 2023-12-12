@@ -49,3 +49,5 @@ export const CARD_DEPLETED = 10022;
 export const SCHEDULE_RECORD_NOT_EXIST = 10023;
 // 预约失败
 export const ORDER_FAIL = 10024;
+// 取消预约失败
+export const CANCEL_ORDER_COURSE_FAIL = 10025;
