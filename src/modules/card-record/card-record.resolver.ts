@@ -3,7 +3,11 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import * as dayjs from 'dayjs';
 import { FindOptionsWhere } from 'typeorm';
 
-import { CARD_NOT_EXIST, DB_ERROR, SUCCESS } from '@/common/constants/code';
+import {
+  CARD_RECORD_NOT_EXIST,
+  DB_ERROR,
+  SUCCESS,
+} from '@/common/constants/code';
 import { CardRecordStatus, CardType } from '@/common/constants/enum';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
@@ -34,8 +38,8 @@ export class CardRecordResolver {
       };
     }
     return {
-      code: CARD_NOT_EXIST,
-      message: '消费卡信息不存在',
+      code: CARD_RECORD_NOT_EXIST,
+      message: '消费卡记录信息不存在',
     };
   }
 
@@ -58,12 +62,13 @@ export class CardRecordResolver {
 
     const data = results.map((cr) => {
       let status = CardRecordStatus.VALID;
+      if (dayjs().isAfter(cr.endTime)) {
+        // 过期了
+        status = CardRecordStatus.EXPIRED;
+      }
       if (cr.card.type === CardType.TIME && cr.remainTime === 0) {
         // 耗尽了
         status = CardRecordStatus.DEPLETED;
-      } else if (dayjs().isAfter(cr.endTime)) {
-        // 过期了
-        status = CardRecordStatus.EXPIRED;
       }
       return {
         ...cr,
@@ -102,8 +107,8 @@ export class CardRecordResolver {
       };
     }
     return {
-      code: CARD_NOT_EXIST,
-      message: '消费卡信息不存在',
+      code: CARD_RECORD_NOT_EXIST,
+      message: '消费卡记录信息不存在',
     };
   }
 }

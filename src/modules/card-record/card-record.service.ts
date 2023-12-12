@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  DeepPartial,
+  FindManyOptions,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
+
+import { CardType } from '@/common/constants/enum';
 
 import { Card } from '../card/models/card.entity';
 import { StudentService } from '../student/student.service';
@@ -35,7 +42,7 @@ export class CardRecordService {
       cr.student = student;
       cr.course = card.course;
       cr.store = card.store;
-      crs.push(await this.cardRecordRepository.create(cr));
+      crs.push(this.cardRecordRepository.create(cr));
     }
     const res = await this.cardRecordRepository.save(crs);
 
@@ -98,6 +105,36 @@ export class CardRecordService {
       },
       relations: ['card', 'store'],
     });
+  }
+
+  // 获取当前学生所有有效的消费卡记录
+  async findValidCardRecords(studentId: string): Promise<CardRecord[]> {
+    const options: FindManyOptions<CardRecord> = {
+      where: {
+        student: {
+          id: studentId,
+        },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: ['card', 'course', 'course.store'],
+    };
+    const records = await this.cardRecordRepository.find(options);
+    const data = [];
+    for (const r of records) {
+      if (dayjs().isBefore(r.endTime)) {
+        // 没过期
+        if (
+          r.card.type === CardType.DURATION ||
+          (r.card.type === CardType.TIME && r.remainTime === 0)
+        ) {
+          // 是时长卡 或 次数卡还有次数
+          data.push(r);
+        }
+      }
+    }
+    return data;
   }
 
   async deleteById(id: string, userId: string): Promise<boolean> {

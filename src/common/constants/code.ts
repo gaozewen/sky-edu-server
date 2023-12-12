@@ -37,3 +37,5 @@ export const WX_ORDER_NOT_EXIST = 10016;
 export const TEACHER_NOT_EXIST = 10017;
 // 课程表信息不存在
 export const SCHEDULE_NOT_EXIST = 10018;
+// 消费卡记录信息不存在
+export const CARD_RECORD_NOT_EXIST = 10019;

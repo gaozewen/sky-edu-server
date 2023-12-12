@@ -4,15 +4,22 @@ import * as dayjs from 'dayjs';
 import * as _ from 'lodash';
 import { Between, FindOptionsWhere } from 'typeorm';
 
-import { DB_ERROR, SCHEDULE_NOT_EXIST, SUCCESS } from '@/common/constants/code';
+import {
+  CARD_RECORD_NOT_EXIST,
+  DB_ERROR,
+  SCHEDULE_NOT_EXIST,
+  SUCCESS,
+} from '@/common/constants/code';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
+import { CardRecordService } from '../card-record/card-record.service';
 import { CourseService } from '../course/course.service';
 import { OrderTimeVO } from '../course/vo/course.vo';
+import { StoreResultsVO, StoreVO } from '../store/vo/store.vo';
 import { Schedule } from './models/schedule.entity';
 import { ScheduleService } from './schedule.service';
 import {
@@ -27,6 +34,7 @@ export class ScheduleResolver {
   constructor(
     private readonly scheduleService: ScheduleService,
     private readonly courseService: CourseService,
+    private readonly cardRecordService: CardRecordService,
   ) {}
 
   @Query(() => ScheduleResultVO)
@@ -228,6 +236,49 @@ export class ScheduleResolver {
     return {
       code: SCHEDULE_NOT_EXIST,
       message: '课程表信息不存在',
+    };
+  }
+
+  @Query(() => StoreResultsVO, {
+    description: '获取当前学员可约的课程，按门店分组',
+  })
+  async getCanOrderedCoursesGroupByStore(
+    @JwtUserId() userId: string,
+  ): Promise<StoreResultsVO> {
+    // 1. 获取当前学员拥有的有效的消费卡记录
+    const cardRecords =
+      await this.cardRecordService.findValidCardRecords(userId);
+    if (!cardRecords || cardRecords.length === 0) {
+      return {
+        code: CARD_RECORD_NOT_EXIST,
+        message: '没有可用的消费卡，快去购买吧',
+      };
+    }
+    // 2. 获取可约的课
+    const courses = cardRecords.map((cr) => cr.course);
+    // 3. 去除重复课程
+    const uniqCourses = _.uniqBy(courses, 'id');
+    // 4. 按照门店，对课程做分组
+    const storesObj: Record<string, StoreVO> = {};
+    for (const c of uniqCourses) {
+      const existStoreVO = storesObj[c.store.id];
+      if (existStoreVO) {
+        existStoreVO.courses.push(c);
+      } else {
+        storesObj[c.store.id] = {
+          ...c.store,
+          courses: [c],
+        };
+      }
+    }
+    const stores: StoreVO[] = Object.values(storesObj);
+    return {
+      code: SUCCESS,
+      message: '获取成功',
+      data: stores,
+      pageInfo: {
+        total: stores.length,
+      },
     };
   }
 }
