@@ -39,3 +39,5 @@ export const TEACHER_NOT_EXIST = 10017;
 export const SCHEDULE_NOT_EXIST = 10018;
 // 消费卡记录信息不存在
 export const CARD_RECORD_NOT_EXIST = 10019;
+// 没库存了
+export const OUT_OF_STOCK = 10020;

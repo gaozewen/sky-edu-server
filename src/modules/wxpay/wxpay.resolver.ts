@@ -6,6 +6,7 @@ import WxPay from 'wechatpay-node-v3';
 
 import { IS_MOCK_PAY } from '@/common/constants';
 import {
+  OUT_OF_STOCK,
   PRODUCT_NOT_EXIST,
   SUCCESS,
   WX_OPENID_NOT_EXIST,
@@ -130,6 +131,12 @@ export class WxPayResolver {
   ): Promise<ResultVO> {
     const student = await this.studentService.findById(id);
     const product = await this.productService.findById(productId);
+    if (product.curStock <= 0) {
+      return {
+        code: OUT_OF_STOCK,
+        message: '支付失败，商品已售罄',
+      };
+    }
     const outTradeNo = v4().replace(/-/g, '');
     // 1.创建项目自己的预支付订单
     await this.orderService.create({
@@ -171,6 +178,12 @@ export class WxPayResolver {
 
     // 2.为当前购买用户生成商品对应的消费卡记录
     await this.cardRecordService.addCardRecordsForStudent(id, product.cards);
+
+    // 3. 扣库存，加已售
+    await this.productService.updateById(productId, {
+      curStock: product.curStock - 1,
+      sellNumber: product.sellNumber + 1,
+    });
 
     return {
       code: SUCCESS,

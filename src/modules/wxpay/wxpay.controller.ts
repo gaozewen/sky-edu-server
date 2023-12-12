@@ -107,12 +107,28 @@ export class WxpayController {
         });
         // 为当前购买用户生成商品对应的消费卡记录
         const product = await this.productService.findById(order.product.id);
-        const isSuccess = await this.cardRecordService.addCardRecordsForStudent(
-          order.student.id,
-          product.cards,
-        );
-        if (!isSuccess) {
-          // TODO: 记录错误日志，发邮件给管理员，手动处理
+        if (product.curStock <= 0) {
+          // TODO: 没库存，执行退款操作
+        } else {
+          // 有库存，扣库存，加已售
+          let isSuccess = await this.productService.updateById(product.id, {
+            curStock: product.curStock - 1,
+            sellNumber: product.sellNumber + 1,
+          });
+
+          // 扣库存成功
+          if (isSuccess) {
+            isSuccess = await this.cardRecordService.addCardRecordsForStudent(
+              order.student.id,
+              product.cards,
+            );
+            if (!isSuccess) {
+              // TODO: 记录错误日志，发邮件给管理员，手动处理
+            }
+          } else {
+            // 扣库存失败
+            // TODO: 记录错误日志，发邮件给管理员，手动处理
+          }
         }
       }
     }
