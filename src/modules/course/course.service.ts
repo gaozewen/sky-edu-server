@@ -67,7 +67,7 @@ export class CourseService {
       order: {
         createdAt: 'DESC',
       },
-      relations: ['store'],
+      relations: ['store', 'teachers'],
     };
 
     if (noPage) {

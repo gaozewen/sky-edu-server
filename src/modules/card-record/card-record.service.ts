@@ -118,7 +118,7 @@ export class CardRecordService {
       order: {
         createdAt: 'DESC',
       },
-      relations: ['card', 'course', 'course.store'],
+      relations: ['card', 'course', 'course.store', 'course.teachers'],
     };
     const records = await this.cardRecordRepository.find(options);
     const data = [];
@@ -127,7 +127,7 @@ export class CardRecordService {
         // 没过期
         if (
           r.card.type === CardType.DURATION ||
-          (r.card.type === CardType.TIME && r.remainTime === 0)
+          (r.card.type === CardType.TIME && r.remainTime !== 0)
         ) {
           // 是时长卡 或 次数卡还有次数
           data.push(r);

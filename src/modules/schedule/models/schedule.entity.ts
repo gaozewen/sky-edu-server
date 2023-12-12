@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Course } from '@/modules/course/models/course.entity';
 import { Store } from '@/modules/store/models/store.entity';
+import { Teacher } from '@/modules/teacher/models/teacher.entity';
 
 /**
  * 课程表
@@ -47,4 +48,11 @@ export class Schedule extends CommonEntity {
   })
   @JoinColumn({ name: 'course_id' })
   course: Course;
+
+  // 关联老师
+  @ManyToOne(() => Teacher, {
+    cascade: true,
+  })
+  @JoinColumn({ name: 'teacher_id' })
+  teacher: Teacher;
 }

@@ -52,6 +52,7 @@ export class ProductResolver {
     if (!id) {
       const res = await this.productService.create({
         ...params,
+        curStock: params.stock,
         createdBy: userId,
         store: {
           id: storeId,

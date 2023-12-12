@@ -107,6 +107,7 @@ export class ScheduleResolver {
             schedule.course = course;
             schedule.schoolDay = curDay.toDate();
             schedule.createdBy = userId;
+            schedule.teacher = course.teachers[0];
 
             // 是否已经排好（数据库已存在）
             const isScheduled = _.some(
@@ -256,8 +257,10 @@ export class ScheduleResolver {
     }
     // 2. 获取可约的课
     const courses = cardRecords.map((cr) => cr.course);
+
     // 3. 去除重复课程
     const uniqCourses = _.uniqBy(courses, 'id');
+
     // 4. 按照门店，对课程做分组
     const storesObj: Record<string, StoreVO> = {};
     for (const c of uniqCourses) {
