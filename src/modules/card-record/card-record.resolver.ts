@@ -87,6 +87,27 @@ export class CardRecordResolver {
     };
   }
 
+  @Query(() => CardRecordResultsVO, {
+    description: '获取当前学员在某个课程上有效的(可用的)消费卡记录',
+  })
+  async getValidCardRecordsByCourse(
+    @Args('courseId') courseId: string,
+    @JwtUserId() userId: string,
+  ): Promise<CardRecordResultsVO> {
+    const cardRecords = await this.cardRecordService.findValidCardRecords({
+      studentId: userId,
+      courseId,
+    });
+    return {
+      code: SUCCESS,
+      data: cardRecords,
+      pageInfo: {
+        total: cardRecords.length,
+      },
+      message: '获取成功',
+    };
+  }
+
   @Mutation(() => ResultVO)
   async deleteCardRecord(
     @Args('id') id: string,

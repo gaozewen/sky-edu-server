@@ -108,17 +108,29 @@ export class CardRecordService {
   }
 
   // 获取当前学生所有有效的消费卡记录
-  async findValidCardRecords(studentId: string): Promise<CardRecord[]> {
-    const options: FindManyOptions<CardRecord> = {
-      where: {
-        student: {
-          id: studentId,
-        },
+  async findValidCardRecords({
+    studentId,
+    courseId,
+  }: {
+    studentId: string;
+    courseId?: string;
+  }): Promise<CardRecord[]> {
+    const where: FindOptionsWhere<CardRecord> = {
+      student: {
+        id: studentId,
       },
+    };
+
+    if (courseId) {
+      where.course = { id: courseId };
+    }
+
+    const options: FindManyOptions<CardRecord> = {
+      where,
       order: {
         createdAt: 'DESC',
       },
-      relations: ['card', 'course', 'course.store', 'course.teachers'],
+      relations: ['card', 'store', 'course', 'course.store', 'course.teachers'],
     };
     const records = await this.cardRecordRepository.find(options);
     const data = [];

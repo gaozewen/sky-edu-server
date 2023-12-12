@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as dayjs from 'dayjs';
 import * as _ from 'lodash';
 import {
+  Between,
   DeepPartial,
   FindManyOptions,
   FindOptionsOrder,
@@ -88,6 +90,28 @@ export class ScheduleService {
       options = _.omit(options, 'take', 'skip');
     }
     return this.scheduleRepository.findAndCount(options);
+  }
+
+  async findValidSchedulesForNext7Days(
+    courseId: string,
+  ): Promise<[Schedule[], number]> {
+    const options: FindManyOptions<Schedule> = {
+      where: {
+        course: {
+          id: courseId,
+        },
+        schoolDay: Between(
+          dayjs().endOf('day').toDate(),
+          dayjs().add(7, 'day').endOf('day').toDate(),
+        ),
+      },
+      order: {
+        schoolDay: 'ASC',
+        startTime: 'ASC',
+      },
+      relations: ['store', 'course', 'course.teachers'],
+    };
+    return await this.scheduleRepository.findAndCount(options);
   }
 
   async deleteById(id: string, userId: string): Promise<boolean> {

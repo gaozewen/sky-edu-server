@@ -247,8 +247,9 @@ export class ScheduleResolver {
     @JwtUserId() userId: string,
   ): Promise<StoreResultsVO> {
     // 1. 获取当前学员拥有的有效的消费卡记录
-    const cardRecords =
-      await this.cardRecordService.findValidCardRecords(userId);
+    const cardRecords = await this.cardRecordService.findValidCardRecords({
+      studentId: userId,
+    });
     if (!cardRecords || cardRecords.length === 0) {
       return {
         code: CARD_RECORD_NOT_EXIST,
@@ -281,6 +282,25 @@ export class ScheduleResolver {
       data: stores,
       pageInfo: {
         total: stores.length,
+      },
+    };
+  }
+
+  @Query(() => ScheduleResultsVO, {
+    description: '获取某一课程近七天的课程表',
+  })
+  async getSchedulesForNext7DaysByCourse(
+    @Args('courseId') courseId: string,
+  ): Promise<ScheduleResultsVO> {
+    const [entities, count] =
+      await this.scheduleService.findValidSchedulesForNext7Days(courseId);
+
+    return {
+      code: SUCCESS,
+      message: '获取成功',
+      data: entities,
+      pageInfo: {
+        total: count,
       },
     };
   }
