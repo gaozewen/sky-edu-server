@@ -5,11 +5,15 @@ import * as _ from 'lodash';
 import { Between, FindOptionsWhere } from 'typeorm';
 
 import {
+  CARD_DEPLETED,
+  CARD_EXPIRED,
   CARD_RECORD_NOT_EXIST,
   DB_ERROR,
+  ORDER_FAIL,
   SCHEDULE_NOT_EXIST,
   SUCCESS,
 } from '@/common/constants/code';
+import { CardType } from '@/common/constants/enum';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
@@ -19,6 +23,7 @@ import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
 import { CardRecordService } from '../card-record/card-record.service';
 import { CourseService } from '../course/course.service';
 import { OrderTimeVO } from '../course/vo/course.vo';
+import { ScheduleRecordService } from '../schedule-record/schedule-record.service';
 import { StoreResultsVO, StoreVO } from '../store/vo/store.vo';
 import { Schedule } from './models/schedule.entity';
 import { ScheduleService } from './schedule.service';
@@ -35,6 +40,7 @@ export class ScheduleResolver {
     private readonly scheduleService: ScheduleService,
     private readonly courseService: CourseService,
     private readonly cardRecordService: CardRecordService,
+    private readonly scheduleRecordService: ScheduleRecordService,
   ) {}
 
   @Query(() => ScheduleResultVO)
@@ -302,6 +308,112 @@ export class ScheduleResolver {
       pageInfo: {
         total: count,
       },
+    };
+  }
+
+  // 学生预约课程
+  @Mutation(() => ResultVO, { description: '学生预约课程' })
+  async orderCourse(
+    @Args('scheduleId') scheduleId: string,
+    @Args('cardRecordId') cardRecordId: string,
+    @JwtUserId() userId: string,
+  ): Promise<ResultVO> {
+    // 判断是否已预约过
+    let scheduleRecord =
+      await this.scheduleRecordService.findByScheduleIdAndStudentId(
+        scheduleId,
+        userId,
+      );
+    if (scheduleRecord?.id) {
+      return {
+        code: ORDER_FAIL,
+        message: '无需重复预约同一时间段',
+      };
+    }
+
+    const cardRecord = await this.cardRecordService.findById(cardRecordId);
+    if (!cardRecord) {
+      return {
+        code: CARD_RECORD_NOT_EXIST,
+        message: '消费卡记录不存在',
+      };
+    }
+
+    // 判断是否过期
+    if (dayjs().isAfter(cardRecord.endTime)) {
+      return {
+        code: CARD_EXPIRED,
+        message: '消费卡已过期',
+      };
+    }
+
+    // 判断次卡是否已耗尽
+    const isTimeCard = cardRecord.card.type === CardType.TIME;
+    if (isTimeCard && cardRecord.remainTime === 0) {
+      return {
+        code: CARD_DEPLETED,
+        message: '消费卡次数已耗尽',
+      };
+    }
+
+    const schedule = await this.scheduleService.findById(scheduleId);
+    if (!schedule) {
+      return {
+        code: SCHEDULE_NOT_EXIST,
+        message: '课程表不存在',
+      };
+    }
+
+    // 创建预约记录
+    scheduleRecord = await this.scheduleRecordService.create({
+      student: {
+        id: userId,
+      },
+      schedule: {
+        id: schedule.id,
+      },
+      cardRecord: {
+        id: cardRecordId,
+      },
+      course: {
+        id: schedule.course.id,
+      },
+      store: {
+        id: schedule.store.id,
+      },
+    });
+
+    if (!scheduleRecord || !scheduleRecord.id) {
+      return {
+        code: ORDER_FAIL,
+        message: '预约失败',
+      };
+    }
+
+    // 核销消费卡
+    // 次卡 -1
+    if (isTimeCard) {
+      const isSuccess = await this.cardRecordService.updateById(cardRecordId, {
+        remainTime: cardRecord.remainTime - 1,
+      });
+      if (isSuccess) {
+        return {
+          code: SUCCESS,
+          message: '预约成功',
+        };
+      }
+      // 失败要删除预约记录
+      await this.scheduleRecordService.deleteById(scheduleRecord.id, userId);
+      return {
+        code: ORDER_FAIL,
+        message: '预约失败',
+      };
+    }
+
+    // 时长卡无需任何操作
+    return {
+      code: SUCCESS,
+      message: '预约成功',
     };
   }
 }

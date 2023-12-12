@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CardRecordModule } from '../card-record/card-record.module';
 import { CourseModule } from '../course/course.module';
+import { ScheduleRecordModule } from '../schedule-record/schedule-record.module';
 import { Schedule } from './models/schedule.entity';
 import { ScheduleResolver } from './schedule.resolver';
 import { ScheduleService } from './schedule.service';
@@ -12,6 +13,7 @@ import { ScheduleService } from './schedule.service';
     TypeOrmModule.forFeature([Schedule]),
     CourseModule,
     CardRecordModule,
+    ScheduleRecordModule,
   ],
   providers: [ScheduleService, ScheduleResolver],
   exports: [ScheduleService],

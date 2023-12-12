@@ -44,7 +44,7 @@ export class ScheduleService {
       where: {
         id,
       },
-      relations: ['course'],
+      relations: ['course', 'store'],
     });
   }
 

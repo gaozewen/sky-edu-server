@@ -15,6 +15,7 @@ import { OrderModule } from './modules/order/order.module';
 import { OSSModule } from './modules/oss/oss.module';
 import { ProductModule } from './modules/product/product.module';
 import { ScheduleModule } from './modules/schedule/schedule.module';
+import { ScheduleRecordModule } from './modules/schedule-record/schedule-record.module';
 import { SMSModule } from './modules/sms/sms.module';
 import { StoreModule } from './modules/store/store.module';
 import { StudentModule } from './modules/student/student.module';
@@ -62,6 +63,7 @@ config();
     TeacherModule,
     CardRecordModule,
     ScheduleModule,
+    ScheduleRecordModule,
   ],
   controllers: [AppController],
   providers: [AppService],

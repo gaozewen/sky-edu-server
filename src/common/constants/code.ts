@@ -41,3 +41,11 @@ export const SCHEDULE_NOT_EXIST = 10018;
 export const CARD_RECORD_NOT_EXIST = 10019;
 // 没库存了
 export const OUT_OF_STOCK = 10020;
+// 消费卡已过期
+export const CARD_EXPIRED = 10021;
+// 消费卡次数已耗尽
+export const CARD_DEPLETED = 10022;
+// 课程表记录信息不存在
+export const SCHEDULE_RECORD_NOT_EXIST = 10023;
+// 预约失败
+export const ORDER_FAIL = 10024;
