@@ -17,6 +17,7 @@ import { CardType } from '@/common/constants/enum';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
+import { genStatus } from '@/common/utils';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
@@ -179,9 +180,18 @@ export class ScheduleResolver {
         startTime: 'ASC',
       },
     });
+
+    const data = results.map((schedule) => ({
+      ...schedule,
+      scheduleRecords: schedule.scheduleRecords.map((sr) => ({
+        ...sr,
+        status: genStatus(sr),
+      })),
+    }));
+
     return {
       code: SUCCESS,
-      data: results,
+      data,
       message: '获取成功',
     };
   }

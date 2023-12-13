@@ -1,7 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 import { CommonEntity } from '@/common/entities/common.entity';
 import { Course } from '@/modules/course/models/course.entity';
+import { ScheduleRecord } from '@/modules/schedule-record/models/schedule-record.entity';
 import { Store } from '@/modules/store/models/store.entity';
 import { Teacher } from '@/modules/teacher/models/teacher.entity';
 
@@ -55,4 +56,8 @@ export class Schedule extends CommonEntity {
   })
   @JoinColumn({ name: 'teacher_id' })
   teacher: Teacher;
+
+  // 关联课程表记录
+  @OneToMany(() => ScheduleRecord, (scheduleRecord) => scheduleRecord.schedule)
+  scheduleRecords: ScheduleRecord[];
 }

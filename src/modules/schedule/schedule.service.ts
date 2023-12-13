@@ -84,7 +84,13 @@ export class ScheduleService {
       order: order || {
         createdAt: 'DESC',
       },
-      relations: ['store', 'course', 'course.teachers'],
+      relations: [
+        'store',
+        'course',
+        'course.teachers',
+        'scheduleRecords',
+        'scheduleRecords.student',
+      ],
     };
     if (noPage) {
       options = _.omit(options, 'take', 'skip');

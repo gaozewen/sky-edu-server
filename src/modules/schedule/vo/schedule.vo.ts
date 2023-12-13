@@ -3,6 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { CommonVO } from '@/common/vo/common.vo';
 import { createGQLResultsVO, createGQLResultVO } from '@/common/vo/result.vo';
 import { CourseVO } from '@/modules/course/vo/course.vo';
+import { ScheduleRecordVO } from '@/modules/schedule-record/vo/schedule-record.vo';
 import { StoreVO } from '@/modules/store/vo/store.vo';
 import { TeacherVO } from '@/modules/teacher/vo/teacher.vo';
 
@@ -45,6 +46,13 @@ export class ScheduleVO extends CommonVO {
     description: '老师',
   })
   teacher: TeacherVO;
+
+  // 关联课程表记录
+  @Field(() => [ScheduleRecordVO], {
+    description: '预约记录',
+    nullable: true,
+  })
+  scheduleRecords?: ScheduleRecordVO[];
 }
 
 @ObjectType()

@@ -3,7 +3,6 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import * as dayjs from 'dayjs';
 import { FindOptionsWhere } from 'typeorm';
 
-import { H_M_S_FORMAT } from '@/common/constants';
 import {
   CANCEL_ORDER_COURSE_FAIL,
   DB_ERROR,
@@ -13,6 +12,7 @@ import {
 import { CardType, ScheduleRecordStatus } from '@/common/constants/enum';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { PageInfoDTO } from '@/common/dto/pageInfo.dto';
+import { genStatus } from '@/common/utils';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { JwtGqlAuthGuard } from '../auth/guard/jwt.gql.guard';
@@ -69,35 +69,6 @@ export class ScheduleRecordResolver {
         length: pageSize,
         where,
       });
-
-    const genStatus = (scheduleRecord: ScheduleRecord) => {
-      let status = ScheduleRecordStatus.PENDING;
-      const { schedule } = scheduleRecord;
-
-      // 如果已经有了，直接返回
-      if (scheduleRecord.status) return scheduleRecord.status;
-
-      const { schoolDay, startTime, endTime } = schedule;
-      const curDay = dayjs();
-      // 和今天是同一天
-      if (curDay.isSame(schoolDay, 'day')) {
-        if (
-          curDay.isAfter(dayjs(startTime, H_M_S_FORMAT)) &&
-          curDay.isBefore(dayjs(endTime, H_M_S_FORMAT))
-        ) {
-          // 正在上课
-          status = ScheduleRecordStatus.DOING;
-        } else if (curDay.isAfter(dayjs(endTime, H_M_S_FORMAT))) {
-          // 上完课了
-          status = ScheduleRecordStatus.DONE;
-        }
-      } else if (curDay.isAfter(schoolDay, 'day')) {
-        // 今天在上课日期之后
-        // 上完课了
-        status = ScheduleRecordStatus.DONE;
-      }
-      return status;
-    };
 
     const data = results.map((r) => ({
       ...r,
