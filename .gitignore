@@ -36,5 +36,6 @@ lerna-debug.log*
 
 # .env
 .env
+.env.*
 
 /wx

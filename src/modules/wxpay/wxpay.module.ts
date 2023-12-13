@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { config } from 'dotenv';
 import * as fs from 'fs';
 import { WeChatPayModule } from 'nest-wechatpay-node-v3';
 
@@ -10,7 +9,6 @@ import { StudentModule } from '../student/student.module';
 import { WxOrderModule } from '../wx-order/wx-order.module';
 import { WxpayController } from './wxpay.controller';
 import { WxPayResolver } from './wxpay.resolver';
-config();
 
 @Module({
   imports: [

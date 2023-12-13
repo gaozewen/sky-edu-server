@@ -3,7 +3,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { config } from 'dotenv';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -23,8 +22,6 @@ import { TeacherModule } from './modules/teacher/teacher.module';
 import { UserModule } from './modules/user/user.module';
 import { WxOrderModule } from './modules/wx-order/wx-order.module';
 import { WxpayModule } from './modules/wxpay/wxpay.module';
-
-config();
 
 @Module({
   imports: [
