@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as dayjs from 'dayjs';
 import { FindOptionsWhere, Repository } from 'typeorm';
 
+import { IS_DEV } from '@/common/constants';
 import { Platform, TempType } from '@/common/constants/enum';
 
 import { sendAliyunSMS } from './aliyun';
@@ -24,21 +25,20 @@ export class SMSService {
    */
   private async sendSMS(params: SMSInput): Promise<boolean> {
     try {
-      // // 尝试使用阿里云发送短信
-      // let isSuccess = await sendAliyunSMS(params);
-      // // 二次尝试阿里云
-      // if (!isSuccess) isSuccess = await sendAliyunSMS(params);
-
-      // // 切换腾讯云通道
-      // if (!isSuccess) isSuccess = await sendTencentSMS(params);
-
-      // // 二次尝试腾讯云
-      // if (!isSuccess) isSuccess = await sendTencentSMS(params);
-
-      // return isSuccess;
-
       // TODO: 开发时默认都发送成功
-      return true;
+      if (IS_DEV) return true;
+      // 尝试使用阿里云发送短信
+      let isSuccess = await sendAliyunSMS(params);
+      // 二次尝试阿里云
+      if (!isSuccess) isSuccess = await sendAliyunSMS(params);
+
+      // 切换腾讯云通道
+      if (!isSuccess) isSuccess = await sendTencentSMS(params);
+
+      // 二次尝试腾讯云
+      if (!isSuccess) isSuccess = await sendTencentSMS(params);
+
+      return isSuccess;
     } catch (error) {
       console.error('【所有通道短信发送失败】', error);
       return false; // 发送失败
@@ -100,8 +100,8 @@ export class SMSService {
 
   isAuthSMSExpired = (sms: SMS): boolean => {
     const diffTime = dayjs().diff(dayjs(sms.createdAt));
-    // 为了防止盗刷 验证码 24 小时之后过期，一个手机号一天只能发送成功一个验证码
+    //  验证码 5 分钟内有效
     // H * m * s * ms
-    return diffTime >= 24 * 60 * 60 * 1000;
+    return diffTime >= 5 * 60 * 1000;
   };
 }
