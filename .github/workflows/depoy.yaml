@@ -1,0 +1,73 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_NAME: sky-edu-server
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: 进入服务器并拉取最新代码
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          # 检查 sky-edu-server 文件夹是否存在
+          script: |
+            cd /root/study
+            {
+              if [ -d "${{ env.PROJECT_NAME }}" ]; then
+                echo "********* 目录 ${{ env.PROJECT_NAME }} 已存在，直接 pull *********"
+                cd ${{ env.PROJECT_NAME }}
+                git pull
+              else
+                echo "********* 目录 ${{ env.PROJECT_NAME }} 不存在，执行 git clone *********"
+                git clone git@github.com:gaozewen/${{ env.PROJECT_NAME }}.git
+              fi
+            } || true
+
+      - name: 停止并删除旧容器 && 删除所有 ${{ env.PROJECT_NAME }} 镜像
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            echo "********* 停止容器 *********"
+            docker stop ${{ env.PROJECT_NAME }}
+            echo "********* 删除容器 *********"
+            docker rm ${{ env.PROJECT_NAME }}
+            echo "********* 删除所有 ${{ env.PROJECT_NAME }} 镜像 *********"
+            docker rmi $(docker images -q ${{ env.PROJECT_NAME }})
+
+      - name: 重新 build ${{ env.PROJECT_NAME }} 镜像 && 运行新容器
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            cd /root/study/${{ env.PROJECT_NAME }}
+            docker build -t ${{ env.PROJECT_NAME }}:${{ github.sha }} . || true
+
+      - name: 运行新容器
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          script: |
+            docker run -d \
+                       --restart unless-stopped \
+                       --name ${{ env.PROJECT_NAME }} \
+                       -v /root/config/${{ env.PROJECT_NAME }}:/etc/${{ env.PROJECT_NAME }} \
+                       --link mysql8.2.0 \
+                       -p 3000:3000 \
+                       ${{ env.PROJECT_NAME }}:${{ github.sha }}
