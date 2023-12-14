@@ -41,11 +41,12 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             echo "********* 停止容器 *********"
-            docker stop ${{ env.PROJECT_NAME }}
+            docker stop ${{ env.PROJECT_NAME }} || true
             echo "********* 删除容器 *********"
-            docker rm ${{ env.PROJECT_NAME }}
+            docker rm ${{ env.PROJECT_NAME }} || true
             echo "********* 删除所有 ${{ env.PROJECT_NAME }} 镜像 *********"
-            docker rmi $(docker images -q ${{ env.PROJECT_NAME }})
+            docker rmi $(docker images -q ${{ env.PROJECT_NAME }}) || true
+            echo "********* ALL CLEAR *********"
 
       - name: 重新 build ${{ env.PROJECT_NAME }} 镜像 && 运行新容器
         uses: appleboy/ssh-action@master
