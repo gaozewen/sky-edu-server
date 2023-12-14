@@ -3,9 +3,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { config } from 'dotenv';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { IS_DEV } from './common/constants';
 import { AuthModule } from './modules/auth/auth.module';
 import { CardModule } from './modules/card/card.module';
 import { CardRecordModule } from './modules/card-record/card-record.module';
@@ -22,6 +24,10 @@ import { TeacherModule } from './modules/teacher/teacher.module';
 import { UserModule } from './modules/user/user.module';
 import { WxOrderModule } from './modules/wx-order/wx-order.module';
 import { WxpayModule } from './modules/wxpay/wxpay.module';
+
+config({
+  path: IS_DEV ? '.env' : '/etc/sky-edu-server/.env',
+});
 
 @Module({
   imports: [

@@ -2,7 +2,8 @@ FROM node:18 AS builder
 
 COPY package.json .
 COPY pnpm-lock.yaml .
-RUN npm i -g pnpm && pnpm i
+RUN npm config set registry https://registry.npmmirror.com && npm i -g pnpm
+RUN pnpm config set registry https://registry.npmmirror.com && pnpm i
 
 COPY . .
 RUN pnpm run build
@@ -13,12 +14,9 @@ WORKDIR /opt/app
 
 COPY --from=builder ./node_modules ./node_modules
 COPY --from=builder ./dist ./dist
-COPY ./package.json ./package.json
-COPY ./wx ./wx
-COPY ./.env.prod ./.env.prod
-
-RUN npm i -g dotenv-cli
 
 EXPOSE 3000
 
-CMD [ "npm", "run", "start:prod" ]
+ENV NODE_ENV=production
+
+CMD [ "node", "dist/main" ]
