@@ -11,6 +11,8 @@ async function bootstrap() {
       'http://192.168.2.23:5174',
       'http://192.168.1.100:5174',
       'https://sky-edu-api.gaozewen.com',
+      'https://sky-edu-pc.gaozewen.com',
+      'https://sky-edu-mobile.gaozewen.com',
     ],
     methods: ['POST', 'GET'],
   });
