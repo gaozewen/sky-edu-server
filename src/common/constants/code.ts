@@ -51,3 +51,5 @@ export const SCHEDULE_RECORD_NOT_EXIST = 10023;
 export const ORDER_FAIL = 10024;
 // 取消预约失败
 export const CANCEL_ORDER_COURSE_FAIL = 10025;
+// 可约时间不存在
+export const WEEKLY_ORDER_TIMES_NOT_EXIST = 10026;

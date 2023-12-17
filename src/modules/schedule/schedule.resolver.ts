@@ -13,6 +13,7 @@ import {
   ORDER_FAIL,
   SCHEDULE_NOT_EXIST,
   SUCCESS,
+  WEEKLY_ORDER_TIMES_NOT_EXIST,
 } from '@/common/constants/code';
 import { CardType } from '@/common/constants/enum';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
@@ -103,6 +104,12 @@ export class ScheduleResolver {
       //   {"week":"Monday","orderTimes":[{"id":"xxx","startTime":"","endTime":""}]}
       // ]
       const weeklyOrderTimes = course.weeklyOrderTimes;
+      if (!weeklyOrderTimes || weeklyOrderTimes.length === 0) {
+        return {
+          code: WEEKLY_ORDER_TIMES_NOT_EXIST,
+          message: '可约时间不存在，请先去设置课程可约时间',
+        };
+      }
       const weeklyOrderTimeObj: Record<string, OrderTimeVO[]> = {};
       for (const wot of weeklyOrderTimes) {
         weeklyOrderTimeObj[wot.week] = wot.orderTimes;
@@ -165,7 +172,7 @@ export class ScheduleResolver {
     }
     return {
       code: DB_ERROR,
-      message: '排课失败',
+      message: '排课失败，请联系管理员',
     };
   }
 

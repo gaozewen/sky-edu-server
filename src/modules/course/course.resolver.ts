@@ -54,7 +54,8 @@ export class CourseResolver {
         store: {
           id: storeId,
         },
-        teachers,
+        // 传了 teacherIds 参数，才创建 teachers
+        ...(teacherIds ? { teachers } : {}),
       });
       if (res) {
         return {
@@ -72,7 +73,8 @@ export class CourseResolver {
       const res = await this.courseService.updateById(course.id, {
         ...params,
         updatedBy: userId,
-        teachers,
+        // 传了 teacherIds 参数，才更新 teachers
+        ...(teacherIds ? { teachers } : {}),
       });
       if (res) {
         return {
