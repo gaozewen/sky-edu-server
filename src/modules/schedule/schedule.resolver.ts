@@ -8,6 +8,7 @@ import {
   CARD_DEPLETED,
   CARD_EXPIRED,
   CARD_RECORD_NOT_EXIST,
+  COURSE_NOT_EXIST,
   DB_ERROR,
   ORDER_FAIL,
   SCHEDULE_NOT_EXIST,
@@ -68,7 +69,23 @@ export class ScheduleResolver {
     @JwtUserId() userId: string,
     @CurStoreId() storeId: string,
   ): Promise<ResultVO> {
-    // 获取已排好的课表
+    // 1.获取当前门店下的所有课程
+    const [courses] = await this.courseService.findCourses({
+      where: {
+        store: {
+          id: storeId,
+        },
+      },
+      noPage: true,
+    });
+    if (!courses || courses.length === 0) {
+      return {
+        code: COURSE_NOT_EXIST,
+        message: '课程不存在，请先去创建课程',
+      };
+    }
+
+    // 2.获取已排好的课表
     const [createdSchedules] = await this.scheduleService.findSchedules({
       where: {
         store: {
@@ -79,16 +96,7 @@ export class ScheduleResolver {
       noPage: true,
     });
 
-    // 1.获取当前门店下的所有课程
-    const [courses] = await this.courseService.findCourses({
-      where: {
-        store: {
-          id: storeId,
-        },
-      },
-      noPage: true,
-    });
-    // 2.获取每个课程的可约时间
+    // 3.获取每个课程的可约时间
     const schedules = [];
     for (const course of courses) {
       // [
@@ -99,7 +107,7 @@ export class ScheduleResolver {
       for (const wot of weeklyOrderTimes) {
         weeklyOrderTimeObj[wot.week] = wot.orderTimes;
       }
-      // 3.从 startDay 排到 endDay，当天是周几就用周几的可约时间
+      // 4.从 startDay 排到 endDay，当天是周几就用周几的可约时间
       let curDay = dayjs(startDay);
       while (curDay.isBefore(dayjs(endDay).add(1, 'd'))) {
         const curWeek = curDay.format('dddd');
@@ -137,7 +145,7 @@ export class ScheduleResolver {
       }
     }
 
-    // 去重
+    // 5.去重
     const uniqSchedules = _.uniqWith(
       schedules,
       (a: Schedule, b: Schedule) =>
