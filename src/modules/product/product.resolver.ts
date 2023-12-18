@@ -27,7 +27,6 @@ import {
 } from './vo/product.vo';
 
 @Resolver(() => ProductVO)
-@UseGuards(JwtGqlAuthGuard)
 export class ProductResolver {
   constructor(private readonly productService: ProductService) {}
 
@@ -47,6 +46,7 @@ export class ProductResolver {
     };
   }
 
+  @UseGuards(JwtGqlAuthGuard)
   @Mutation(() => ResultVO)
   async commitProduct(
     @Args('params') params: PartialProductDTO,
@@ -79,6 +79,8 @@ export class ProductResolver {
     const product = await this.productService.findById(id);
     if (product) {
       const { cardIds, status } = params;
+      const newCards =
+        cardIds && cardIds.length > 0 ? cardIds.map((i) => ({ id: i })) : [];
       // 如果是上架操作
       if (status === ProductStatus.LIST) {
         const { cards } = product;
@@ -93,8 +95,8 @@ export class ProductResolver {
       const res = await this.productService.updateById(product.id, {
         ...params,
         updatedBy: userId,
-        cards:
-          cardIds && cardIds.length > 0 ? cardIds.map((i) => ({ id: i })) : [],
+        // 传了 cardIds 参数，才更新 cards
+        ...(cardIds ? { cards: newCards } : {}),
       });
       if (res) {
         return {
@@ -113,6 +115,7 @@ export class ProductResolver {
     };
   }
 
+  @UseGuards(JwtGqlAuthGuard)
   @Query(() => ProductResultsVO)
   async getProducts(
     @Args('pageInfo') pageInfo: PageInfoDTO,
@@ -223,6 +226,7 @@ export class ProductResolver {
     };
   }
 
+  @UseGuards(JwtGqlAuthGuard)
   @Mutation(() => ResultVO)
   async deleteProduct(
     @Args('id') id: string,

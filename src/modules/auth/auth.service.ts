@@ -289,7 +289,6 @@ export class AuthService {
     const { account } = params;
     const student = await this.studentService.findByAccount(account);
 
-    // 账号密码登录
     return await this.studentAccountRegister(params, student);
   }
 }

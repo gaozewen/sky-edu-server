@@ -21,6 +21,7 @@ export class Order extends CommonEntity {
 
   @Column({
     comment: '手机号',
+    nullable: true,
   })
   tel: string;
 
