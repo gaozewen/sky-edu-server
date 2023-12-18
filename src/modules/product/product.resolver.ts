@@ -2,7 +2,12 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FindOptionsWhere, Like } from 'typeorm';
 
-import { DB_ERROR, PRODUCT_NOT_EXIST, SUCCESS } from '@/common/constants/code';
+import {
+  CARD_NOT_EXIST,
+  DB_ERROR,
+  PRODUCT_NOT_EXIST,
+  SUCCESS,
+} from '@/common/constants/code';
 import { ProductStatus } from '@/common/constants/enum';
 import { CurStoreId } from '@/common/decorators/CurStoreId.decorator';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
@@ -73,7 +78,18 @@ export class ProductResolver {
     }
     const product = await this.productService.findById(id);
     if (product) {
-      const { cardIds } = params;
+      const { cardIds, status } = params;
+      // 如果是上架操作
+      if (status === ProductStatus.LIST) {
+        const { cards } = product;
+        // 判断是否绑定消费卡
+        if (!cards || cards.length === 0) {
+          return {
+            code: CARD_NOT_EXIST,
+            message: '上架失败，未绑定消费卡，请先为商品绑定消费卡',
+          };
+        }
+      }
       const res = await this.productService.updateById(product.id, {
         ...params,
         updatedBy: userId,
@@ -212,8 +228,16 @@ export class ProductResolver {
     @Args('id') id: string,
     @JwtUserId() userId: string,
   ): Promise<ResultVO> {
-    const result = await this.productService.findById(id);
-    if (result) {
+    const product = await this.productService.findById(id);
+    if (product) {
+      const { status } = product;
+      // 商品上架状态，无法删除
+      if (status === ProductStatus.LIST) {
+        return {
+          code: DB_ERROR,
+          message: '删除失败，商品上架状态，无法删除',
+        };
+      }
       const delRes = await this.productService.deleteById(id, userId);
       if (delRes) {
         return {
