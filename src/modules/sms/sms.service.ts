@@ -2,10 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 // 必须这样引入否则会报错
 import * as dayjs from 'dayjs';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 
 import { IS_DEV } from '@/common/constants';
+import {
+  AUTH_CODE_ERROR,
+  AUTH_CODE_EXPIRED,
+  SUCCESS,
+} from '@/common/constants/code';
 import { Platform, TempType } from '@/common/constants/enum';
+import { ResultVO } from '@/common/vo/result.vo';
 
 import { sendAliyunSMS } from './aliyun';
 import { SMS } from './models/sms.entity';
@@ -45,16 +51,18 @@ export class SMSService {
     }
   }
 
-  // 将验证码插入数据库
+  // 新建短信发送记录
   private async create(phoneNumber: string, code: string): Promise<boolean> {
     try {
-      const res = await this.smsRepository.insert({
-        tel: phoneNumber,
-        code,
-      });
-      const isSuccess = res && res.raw && res.raw.affectedRows > 0;
-      if (!isSuccess) console.error('【数据库：验证码插入失败】');
-      return isSuccess;
+      const res = await this.smsRepository.save(
+        this.smsRepository.create({
+          tel: phoneNumber,
+          code,
+        }),
+      );
+      if (res) return true;
+      console.error('【数据库：验证码插入失败】');
+      return false;
     } catch (error) {
       console.error('【数据库：验证码插入失败】', error);
       return false;
@@ -82,21 +90,63 @@ export class SMSService {
   }
 
   /**
-   * 查询手机号验证码记录
+   * 获取该手机号 5 分钟内的所有验证码
+   * @param tel 手机号
    */
-  async findSMSByTel(tel: string): Promise<SMS> {
-    const res = await this.smsRepository.findOne({ where: { tel } });
-    return res;
+  async getSMSsWithin5MinutesByTel(tel: string): Promise<[SMS[], number]> {
+    return this.smsRepository.findAndCount({
+      where: {
+        tel,
+        createdAt: Between(
+          dayjs().subtract(5, 'minute').toDate(),
+          dayjs().toDate(),
+        ),
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
   }
 
-  // 删除 SMS 记录
-  async delete(tel: string): Promise<boolean> {
-    const findOptionsWhere: FindOptionsWhere<SMS> = {
-      tel,
+  /**
+   * 验证码有效性校验
+   * @param tel 手机号
+   * @param code 验证码
+   * @returns Promise<ResultVO>
+   */
+  async verifyCodeByTel(code: string, tel: string): Promise<ResultVO> {
+    // 1.获取该手机号 5 分钟内的所有验证码
+    const [SMSs] = await this.getSMSsWithin5MinutesByTel(tel);
+
+    // 2验证码不存在 || 已过期
+    if (!SMSs || SMSs.length === 0) {
+      return {
+        code: AUTH_CODE_EXPIRED,
+        message: '验证码已过期，请重新获取',
+      };
+    }
+    // 3验证码不正确
+    if (!SMSs.some((sms) => sms.code === code)) {
+      return {
+        code: AUTH_CODE_ERROR,
+        message: '验证码错误',
+      };
+    }
+
+    return {
+      code: SUCCESS,
+      message: '验证成功',
     };
-    const res = await this.smsRepository.delete(findOptionsWhere);
-    return res && res.affected > 0;
   }
+
+  // 用户获取验证码是否过于频繁
+  // (1 分钟之内只能发送一次)
+  isGetSMSFrequently = (sms: SMS): boolean => {
+    const diffTime = dayjs().diff(dayjs(sms.createdAt));
+    // 1 分钟之内用户再次获取，即算频繁
+    // H * m * s * ms
+    return diffTime < 1 * 60 * 1000;
+  };
 
   isAuthSMSExpired = (sms: SMS): boolean => {
     const diffTime = dayjs().diff(dayjs(sms.createdAt));

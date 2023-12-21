@@ -3,11 +3,9 @@ import { JwtService } from '@nestjs/jwt';
 import {
   ACCOUNT_EXIST,
   ACCOUNT_NOT_EXIST,
-  AUTH_CODE_ERROR,
-  AUTH_CODE_EXPIRED,
-  AUTH_CODE_NOT_EXPIRED,
   DB_ERROR,
   GET_AUTH_CODE_FAILED,
+  GET_SMS_FREQUENTLY,
   PARAMS_REQUIRED_ERROR,
   PASSWORD_ERROR,
   SUCCESS,
@@ -37,17 +35,17 @@ export class AuthService {
 
   // 发送授权短信验证码
   async sendAuthSMS(tel: string): Promise<ResultVO> {
-    const sms = await this.smsService.findSMSByTel(tel);
+    const [SMSs] = await this.smsService.getSMSsWithin5MinutesByTel(tel);
+    // 取最近一次发送的验证码
+    const sms = SMSs[0];
     if (sms) {
-      if (!this.smsService.isAuthSMSExpired(sms)) {
-        // 未过期，直接返回提示
+      if (this.smsService.isGetSMSFrequently(sms)) {
+        // 1 分钟内再次获取，直接返回提示
         return {
-          code: AUTH_CODE_NOT_EXPIRED,
-          message: '验证码尚未过期',
+          code: GET_SMS_FREQUENTLY,
+          message: '验证码获取过于频繁，请稍后再试',
         };
       }
-      // 已过期,删除验证码
-      await this.smsService.delete(tel);
     }
 
     const genRandomCode = () => {
@@ -99,7 +97,7 @@ export class AuthService {
   ): Promise<ResultVO> {
     const { tel, code } = params;
 
-    // 0.手机号或验证码未输入
+    // 1.AdminLoginDTO 校验
     if (!tel || !code) {
       return {
         code: PARAMS_REQUIRED_ERROR,
@@ -107,30 +105,21 @@ export class AuthService {
       };
     }
 
-    const sms = await this.smsService.findSMSByTel(tel);
+    // 2.验证码有效性校验
+    const codeValidRes = await this.smsService.verifyCodeByTel(code, tel);
+    if (codeValidRes.code !== SUCCESS) {
+      return codeValidRes;
+    }
 
-    // 1.验证码不存在 或 已过期
-    if (!sms || !sms.code || this.smsService.isAuthSMSExpired(sms)) {
-      return {
-        code: AUTH_CODE_EXPIRED,
-        message: '登录失败，验证码已过期，请重新获取',
-      };
-    }
-    // 2.验证码不正确
-    if (code !== sms.code) {
-      return {
-        code: AUTH_CODE_ERROR,
-        message: '登录失败，验证码不正确',
-      };
-    }
-    // 3.用户不存在
+    // 3.User 校验
+    //   3.1 User 不存在
     if (!user) {
-      // 3.1 创建用户
+      //    3.1.1 创建用户
       const createdUser = await this.userService.create({
         account: tel,
         tel,
       });
-      // 3.2 创建成功
+      //    3.1.2 创建成功
       if (createdUser) {
         return {
           code: SUCCESS,
@@ -138,13 +127,13 @@ export class AuthService {
           data: this.genJwtToken(createdUser),
         };
       }
-      // 3.3 创建失败
+      //    3.1.3 创建失败
       return {
         code: DB_ERROR,
         message: '登录失败',
       };
     }
-    // 4.用户存在
+    //   3.2 User 存在
     return {
       code: SUCCESS,
       message: '登录成功',

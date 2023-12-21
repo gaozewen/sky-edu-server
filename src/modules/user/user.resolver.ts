@@ -1,12 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import {
-  AUTH_CODE_ERROR,
-  AUTH_CODE_EXPIRED,
-  DB_ERROR,
-  SUCCESS,
-} from '@/common/constants/code';
+import { DB_ERROR, SUCCESS } from '@/common/constants/code';
 import { JwtUserId } from '@/common/decorators/JwtUserId.decorator';
 import { ResultVO } from '@/common/vo/result.vo';
 
@@ -51,22 +46,13 @@ export class UserResolver {
   @Mutation(() => ResultVO, { description: '重置用户密码' })
   async resetPwd(@Args('params') params: ResetPwdDTO): Promise<ResultVO> {
     const { id, tel, code, password } = params;
-    const sms = await this.smsService.findSMSByTel(tel);
-    // 1.验证码不存在 或 已过期
-    if (!sms || !sms.code || this.smsService.isAuthSMSExpired(sms)) {
-      return {
-        code: AUTH_CODE_EXPIRED,
-        message: '验证码已过期，请重新获取',
-      };
+    // 1.验证码有效性校验
+    const codeValidRes = await this.smsService.verifyCodeByTel(code, tel);
+    //   校验不通过
+    if (codeValidRes.code !== SUCCESS) {
+      return codeValidRes;
     }
-    // 2.验证码不正确
-    if (code !== sms.code) {
-      return {
-        code: AUTH_CODE_ERROR,
-        message: '验证码不正确',
-      };
-    }
-    // 3.更新密码
+    // 2.更新密码
     const isSuccess = await this.userService.update(id, { password });
     if (isSuccess) {
       return {

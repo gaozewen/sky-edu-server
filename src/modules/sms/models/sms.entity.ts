@@ -6,9 +6,11 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { CommonEntity } from '@/common/entities/common.entity';
+
 @Entity('sms')
 @Index('idx_tel', ['tel'])
-export class SMS {
+export class SMS extends CommonEntity {
   @PrimaryGeneratedColumn('uuid', { comment: '主键' })
   id: string;
 
@@ -18,11 +20,4 @@ export class SMS {
 
   @Column({ comment: '验证码' })
   code: string;
-
-  @Column({
-    name: 'created_at',
-    default: () => 'CURRENT_TIMESTAMP',
-    comment: '创建时间',
-  })
-  createdAt: Date;
 }

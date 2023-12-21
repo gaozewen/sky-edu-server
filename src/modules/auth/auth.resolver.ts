@@ -1,5 +1,6 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 
+import { PARAMS_REQUIRED_ERROR } from '@/common/constants/code';
 import { ResultVO } from '@/common/vo/result.vo';
 
 import { AuthService } from './auth.service';
@@ -15,6 +16,13 @@ export class AuthResolver {
 
   @Mutation(() => ResultVO, { description: '发送授权短信验证码' })
   async sendAuthSMS(@Args('tel') tel: string): Promise<ResultVO> {
+    if (!tel) {
+      return {
+        code: PARAMS_REQUIRED_ERROR,
+        message: '手机号不能为空',
+        data: null,
+      };
+    }
     return await this.authService.sendAuthSMS(tel);
   }
 

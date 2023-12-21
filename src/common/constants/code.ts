@@ -3,8 +3,8 @@
 export const SUCCESS = 200;
 // 获取验证码失败
 export const GET_AUTH_CODE_FAILED = 10001;
-// 验证码已过期
-export const AUTH_CODE_NOT_EXPIRED = 10002;
+// 验证码获取过于频繁
+export const GET_SMS_FREQUENTLY = 10002;
 // 验证码已过期
 export const AUTH_CODE_EXPIRED = 10003;
 // 验证码不正确
