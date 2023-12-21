@@ -71,6 +71,7 @@ export class Course extends CommonEntity {
     comment: '预约信息',
     name: 'reserve_info',
     nullable: true,
+    type: 'text',
   })
   reserveInfo: string;
 
@@ -78,6 +79,7 @@ export class Course extends CommonEntity {
     comment: '退款信息',
     name: 'refund_info',
     nullable: true,
+    type: 'text',
   })
   refundInfo: string;
 
@@ -85,6 +87,7 @@ export class Course extends CommonEntity {
     comment: '其他说明信息',
     name: 'other_info',
     nullable: true,
+    type: 'text',
   })
   otherInfo: string;
 
