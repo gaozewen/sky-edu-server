@@ -25,8 +25,9 @@ export class Product extends CommonEntity {
   name: string;
 
   @Column({
-    comment: '描述',
+    comment: '商品描述',
     nullable: true,
+    type: 'text',
   })
   desc: string;
 
