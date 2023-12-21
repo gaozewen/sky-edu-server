@@ -1,22 +1,30 @@
 export const PRODUCT_CATEGORIES = [
   {
-    key: 'music',
-    title: '音乐培训',
+    key: 'frontend',
+    title: '前端开发',
   },
   {
-    key: 'art',
-    title: '美术培训',
+    key: 'backend',
+    title: '后端开发',
   },
   {
-    key: 'foreign',
-    title: '外语培训',
+    key: 'mobile',
+    title: '移动开发',
   },
   {
-    key: 'cook',
-    title: '厨师培训',
+    key: 'fundamentals',
+    title: '计算机基础',
   },
   {
-    key: 'math',
-    title: '数学培训',
+    key: 'emerging_technologies',
+    title: '前沿技术',
+  },
+  {
+    key: 'testing_ops',
+    title: '测试运维',
+  },
+  {
+    key: 'other',
+    title: '更多方向',
   },
 ];
