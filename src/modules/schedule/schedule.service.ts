@@ -89,6 +89,7 @@ export class ScheduleService {
         'course',
         'course.teachers',
         'scheduleRecords',
+        'scheduleRecords.schedule',
         'scheduleRecords.student',
       ],
     };
