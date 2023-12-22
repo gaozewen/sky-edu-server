@@ -57,6 +57,29 @@ export class WxPayResolver {
       };
     }
 
+    // 如果商品有每人限购限制
+    if (product.limitBuyNumber) {
+      const [, buyNumber] = await this.orderService.findOrders({
+        start: 0,
+        length: product.limitBuyNumber,
+        where: {
+          student: {
+            id,
+          },
+          product: {
+            id: productId,
+          },
+        },
+      });
+      // 用户购买数量已达到限购数量
+      if (buyNumber >= product.limitBuyNumber) {
+        return {
+          code: OUT_OF_STOCK,
+          message: `每人限购 ${product.limitBuyNumber} 次`,
+        };
+      }
+    }
+
     if (!student || !student.wxOpenid) {
       return {
         code: WX_OPENID_NOT_EXIST,
@@ -137,6 +160,29 @@ export class WxPayResolver {
         message: '支付失败，商品已售罄',
       };
     }
+    // 如果商品有每人限购限制
+    if (product.limitBuyNumber) {
+      const [, buyNumber] = await this.orderService.findOrders({
+        start: 0,
+        length: product.limitBuyNumber,
+        where: {
+          student: {
+            id,
+          },
+          product: {
+            id: productId,
+          },
+        },
+      });
+      // 用户购买数量已达到限购数量
+      if (buyNumber >= product.limitBuyNumber) {
+        return {
+          code: OUT_OF_STOCK,
+          message: `支付失败，该商品每人限购 ${product.limitBuyNumber} 次`,
+        };
+      }
+    }
+
     const outTradeNo = v4().replace(/-/g, '');
     // 1.创建项目自己的预支付订单
     await this.orderService.create({
