@@ -53,3 +53,7 @@ export const ORDER_FAIL = 10024;
 export const CANCEL_ORDER_COURSE_FAIL = 10025;
 // 可约时间不存在
 export const WEEKLY_ORDER_TIMES_NOT_EXIST = 10026;
+// 不存在有效的排课
+export const VALID_SCHEDULE_NOT_EXIST = 10027;
+// 消费卡存在对应的消费卡记录
+export const CARD_RECORD_EXIST = 10028;
