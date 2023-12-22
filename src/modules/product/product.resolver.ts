@@ -116,27 +116,24 @@ export class ProductResolver {
         }
       }
 
-      // 如果是下架操作
-      if (status === ProductStatus.UN_LIST) {
-        // 已绑定消费卡
-        if (cards && cards.length > 0) {
-          for (const card of cards) {
-            const [, total] = await this.cardRecordService.findCardRecords({
-              start: 0,
-              length: 1,
-              where: {
-                card: {
-                  id: card.id,
-                },
-              },
-            });
-            // 消费卡有学生购买的 CardRecord 记录，则无法下架
-            if (total && total > 0) {
-              return {
-                code: CARD_RECORD_EXIST,
-                message: '下架失败，已有学员购买该商品，无法下架',
-              };
-            }
+      // 传了 cardIds, 即表明有绑定或解绑消费卡操作
+      if (cardIds) {
+        // 查询是否有即将被解绑的消费卡
+        const unBindCards = cards.filter(
+          // 获取原来卡片 id 在 cardIds 数组中不存在的卡片
+          (c) => !cardIds.includes(c.id),
+        );
+
+        // 有需要被解绑的消费卡
+        if (unBindCards && unBindCards.length > 0) {
+          // 该消费卡有学生购买的 CardRecord 记录
+          const { isExist, cardName } =
+            await this.productService.isCardRecordExists(unBindCards);
+          if (isExist) {
+            return {
+              code: CARD_RECORD_EXIST,
+              message: `解绑失败，消费卡：【${cardName}】已被学员购买，无法解绑`,
+            };
           }
         }
       }
@@ -294,23 +291,13 @@ export class ProductResolver {
 
       // 已绑定消费卡
       if (cards && cards.length > 0) {
-        for (const card of cards) {
-          const [, total] = await this.cardRecordService.findCardRecords({
-            start: 0,
-            length: 1,
-            where: {
-              card: {
-                id: card.id,
-              },
-            },
-          });
-          // 消费卡有学生购买的 CardRecord 记录，则无法删除
-          if (total && total > 0) {
-            return {
-              code: CARD_RECORD_EXIST,
-              message: '删除失败，已有学员购买该商品，无法删除',
-            };
-          }
+        // 该消费卡存在 CardRecord
+        const { isExist } = await this.productService.isCardRecordExists(cards);
+        if (isExist) {
+          return {
+            code: CARD_RECORD_EXIST,
+            message: '删除失败，已有学员购买该商品，无法删除',
+          };
         }
       }
 

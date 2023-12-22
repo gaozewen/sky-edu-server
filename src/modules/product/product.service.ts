@@ -4,6 +4,8 @@ import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
 
 import { ProductStatus } from '@/common/constants/enum';
 
+import { Card } from '../card/models/card.entity';
+import { CardRecordService } from '../card-record/card-record.service';
 import { Product } from './models/product.entity';
 
 @Injectable()
@@ -11,6 +13,7 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    private readonly cardRecordService: CardRecordService,
   ) {}
 
   async create(entity: DeepPartial<Product>): Promise<boolean> {
@@ -128,5 +131,36 @@ export class ProductService {
     where: FindOptionsWhere<Product>;
   }): Promise<number> {
     return this.productRepository.count({ where });
+  }
+
+  // 判断是否消费卡已有学生购买的消费卡记录
+  async isCardRecordExists(cards: Card[]): Promise<{
+    isExist: boolean;
+    cardName: string;
+  }> {
+    if (cards && cards.length > 0) {
+      for (const card of cards) {
+        const [, total] = await this.cardRecordService.findCardRecords({
+          start: 0,
+          length: 1,
+          where: {
+            card: {
+              id: card.id,
+            },
+          },
+        });
+        // 消费卡有学生购买的 CardRecord 记录，则无法删除
+        if (total && total > 0) {
+          return {
+            isExist: true,
+            cardName: card.name,
+          };
+        }
+      }
+    }
+    return {
+      isExist: false,
+      cardName: '',
+    };
   }
 }
